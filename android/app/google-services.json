@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1081985622500",
+    "firebase_url": "https://simplecrud-45fdb-default-rtdb.firebaseio.com",
+    "project_id": "simplecrud-45fdb",
+    "storage_bucket": "simplecrud-45fdb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081985622500:android:4256fe1b73afdc176367f1",
+        "android_client_info": {
+          "package_name": "com.simplecrud"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1081985622500-j1lf038tm5v7tf15f4g9f2deq7r62h56.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtnluii46SXkgPlekDfiWG3JdPudEvMB4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1081985622500-j1lf038tm5v7tf15f4g9f2deq7r62h56.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
