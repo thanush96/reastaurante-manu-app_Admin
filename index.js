@@ -3,8 +3,10 @@
  */
 
 import {AppRegistry} from 'react-native';
-// import App from './src/App';
-import App from './src/pages/Add/index';
+import App from './App';
+// import App from './src/pages/Add/index';
+// import App from './src/pages/Add/categoryAdd';
+
 import {name as appName} from './app.json';
 
 import {YellowBox} from 'react-native';

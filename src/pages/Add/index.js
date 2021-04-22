@@ -1,115 +1,4 @@
-// import React, {Component} from 'react';
-// import {
-//   Text,
-//   StyleSheet,
-//   View,
-//   TextInput,
-//   TouchableOpacity,
-//   Alert,
-// } from 'react-native';
-// import {InputData} from '../../components';
-// import FIREBASE from '../../config/FIREBASE';
-
-// export default class Add extends Component {
-//   constructor(props) {
-//     super(props);
-
-//     this.state = {
-//       name: '',
-//       age: '',
-//       address: '',
-//     };
-//   }
-
-//   onChangeText = (nameState, value) => {
-//     this.setState({
-//       [nameState]: value,
-//     });
-//   };
-
-//   onSubmit = () => {
-//     if (this.state.name && this.state.age && this.state.address) {
-//       const AddContact = FIREBASE.database().ref('contact');
-//       const contact = {
-//         name: this.state.name,
-//         age: this.state.age,
-//         address: this.state.address,
-//       };
-
-//       AddContact.push(contact)
-//         .then(data => {
-//           Alert.alert('Success', 'added');
-//         })
-
-//         .catch(error => {
-//           console.log('Error :', error);
-//         });
-
-//       console.log('Added');
-//       console.log(this.state);
-//     } else {
-//       Alert.alert('Error', 'Please Input here');
-//     }
-//   };
-
-//   render() {
-//     return (
-// <View style={styles.pages}>
-//   <InputData
-//     label="name"
-//     placeholder="Name here"
-//     onChangeText={this.onChangeText}
-//     value={this.state.name}
-//     nameState="name"
-//   />
-
-//   <InputData
-//     label="price"
-//     placeholder="price Here"
-//     keyboardType="number-pad"
-//     onChangeText={this.onChangeText}
-//     value={this.state.age}
-//     nameState="age"
-//   />
-
-//   <InputData
-//     label="description"
-//     placeholder="description"
-//     onChangeText={this.onChangeText}
-//     value={this.state.address}
-//     nameState="address"
-//   />
-
-//   <TouchableOpacity style={styles.touch} onPress={() => this.onSubmit()}>
-//     <Text style={styles.submit}>Submit</Text>
-//   </TouchableOpacity>
-// </View>
-//     );
-//   }
-// }
-
-// const styles = StyleSheet.create({
-//   pages: {
-//     flex: 1,
-//     padding: 30,
-//   },
-
-//   touch: {
-//     backgroundColor: 'black',
-//     padding: 10,
-//     borderRadius: 5,
-//     marginTop: 10,
-//   },
-//   submit: {
-//     color: 'white',
-//     fontWeight: 'bold',
-//     textAlign: 'center',
-//     fontSize: 16,
-//   },
-// });
-
 import React, {Component, useState} from 'react';
-
 import {
   View,
   SafeAreaView,
@@ -124,6 +13,7 @@ import ImagePicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import * as Progress from 'react-native-progress';
 import {InputData} from '../../components';
+import {Picker} from '@react-native-picker/picker';
 import FIREBASE from '../../config/FIREBASE';
 
 export default class Details extends Component {
@@ -137,7 +27,29 @@ export default class Details extends Component {
       image: '',
       uploading: false,
       transferred: 0,
+      categoryValue: '',
+      dataSource: [],
     };
+  }
+
+  async get_firebase_list() {
+    return FIREBASE.database()
+      .ref('categories')
+      .once('value')
+      .then(function (snapshot) {
+        var items = [];
+        snapshot.forEach(function (childSnapshot) {
+          var childKey = childSnapshot.key;
+          var childData = childSnapshot.val();
+          items.push(childData);
+        });
+        return items;
+      });
+  }
+  async componentWillMount() {
+    this.setState({
+      dataSource: await this.get_firebase_list(),
+    });
   }
 
   onChangeText = (nameState, value) => {
@@ -151,6 +63,7 @@ export default class Details extends Component {
       const AddContact = FIREBASE.database().ref('contact');
       const contact = {
         name: this.state.name,
+        category: this.state.categoryValue,
         age: this.state.age,
         address: this.state.address,
         imgUrl: imageUrl,
@@ -158,15 +71,13 @@ export default class Details extends Component {
 
       AddContact.push(contact)
         .then(data => {
-          Alert.alert('Success', 'added');
+          console.log('Added');
+          // Alert.alert('Success', 'added');
         })
 
         .catch(error => {
           console.log('Error :', error);
         });
-
-      console.log('Added');
-      // console.log(this.state);
     } else {
       Alert.alert('Error', 'Please Input here');
     }
@@ -220,16 +131,27 @@ export default class Details extends Component {
     }
     this.setState({uploading: false});
 
-    Alert.alert(
-      'Photo uploaded!',
-      'Your photo has been uploaded to Firebase Cloud Storage!',
-    );
+    Alert.alert('Menu uploaded!', 'Your menu has been uploaded!');
     this.setState({image: null});
-    // setImage(null);
   };
   render() {
     return (
       <SafeAreaView style={styles.container}>
+        <Picker
+          onValueChange={(itemValue, itemIndex) =>
+            this.setState({categoryValue: itemValue})
+          }>
+          {this.state.dataSource.map((item, index) => {
+            return (
+              <Picker.Item
+                label={item.categoryName}
+                value={item.categoryName}
+                key={index}
+              />
+            );
+          })}
+        </Picker>
+
         <View style={styles.imageContainer}>
           <InputData
             label="name"

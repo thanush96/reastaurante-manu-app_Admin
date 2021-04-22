@@ -3,17 +3,15 @@ import {faEdit, faTimes} from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
-const CardContact = ({id, contactItem, navigation, removeData}) => {
+const CategoryCard = ({id, categoryItem, navigation, removeData}) => {
   return (
-    <TouchableOpacity
-      style={styles.conatiner}
-      onPress={() => {
-        navigation.navigate('Details', {id: id});
-      }}>
+    <TouchableOpacity style={styles.conatiner}>
+      {/* onPress=
+      {() => {
+        navigation.navigate('fire', {id: id});
+      }} */}
       <View>
-        <Text style={styles.name}>{contactItem.name}</Text>
-        <Text style={styles.age}>{contactItem.age}</Text>
-        <Text style={styles.address}>{contactItem.address}</Text>
+        <Text style={styles.name}>{categoryItem.categoryName}</Text>
       </View>
       <View style={styles.icon}>
         <FontAwesomeIcon
@@ -21,7 +19,7 @@ const CardContact = ({id, contactItem, navigation, removeData}) => {
           color={'orange'}
           size={25}
           onPress={() => {
-            navigation.navigate('Edit', {id: id});
+            navigation.navigate('categoryEdit', {id: id});
           }}
         />
         <FontAwesomeIcon
@@ -37,7 +35,7 @@ const CardContact = ({id, contactItem, navigation, removeData}) => {
   );
 };
 
-export default CardContact;
+export default CategoryCard;
 
 const styles = StyleSheet.create({
   conatiner: {
