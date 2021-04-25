@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, TouchableOpacity, View, StyleSheet, Alert} from 'react-native';
+import {Text, TouchableOpacity, View, StyleSheet, Alert,ScrollView} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faPlus} from '@fortawesome/free-solid-svg-icons';
 import FIREBASE from '../../config/FIREBASE';
@@ -69,10 +69,12 @@ export default class Home extends Component {
     const {contact, contactKey} = this.state;
     return (
       <View style={styles.page}>
-        <View style={styles.header}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+
+        {/* <View style={styles.header}>
           <Text style={styles.title}>Menu</Text>
           <View style={styles.grid} />
-        </View>
+        </View> */}
 
         <View style={styles.listContact}>
           {contactKey.length > 0 ? (
@@ -86,9 +88,12 @@ export default class Home extends Component {
               />
             ))
           ) : (
-            <Text> Details</Text>
+            <Text>No Items</Text>
+
           )}
         </View>
+        </ScrollView>
+
         <View style={styles.wrapperButton}>
           <TouchableOpacity
             style={styles.btn}
@@ -135,7 +140,7 @@ const styles = StyleSheet.create({
 
   btn: {
     padding: 20,
-    backgroundColor: 'skyblue',
+    backgroundColor: '#3399ff',
     borderRadius: 30,
     shadowColor: '#000',
     shadowOffset: {

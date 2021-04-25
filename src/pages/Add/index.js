@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
   Platform,
   Alert,
   Image,
@@ -137,58 +138,57 @@ export default class Details extends Component {
   render() {
     return (
       <SafeAreaView style={styles.container}>
-        <Picker
-          onValueChange={(itemValue, itemIndex) =>
-            this.setState({categoryValue: itemValue})
-          }>
-          {this.state.dataSource.map((item, index) => {
-            return (
-              <Picker.Item
-                label={item.categoryName}
-                value={item.categoryName}
-                key={index}
-              />
-            );
-          })}
-        </Picker>
-
-        <View style={styles.imageContainer}>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <InputData
-            label="name"
-            placeholder="Name here"
+            label="Name"
+            placeholder="Enter the Food Name"
             onChangeText={this.onChangeText}
             value={this.state.name}
             nameState="name"
           />
-
           <InputData
-            label="price"
-            placeholder="price Here"
+            label="Price"
+            placeholder="Enter the Unit Price"
             keyboardType="number-pad"
             onChangeText={this.onChangeText}
             value={this.state.age}
             nameState="age"
           />
-
           <InputData
-            label="description"
-            placeholder="description"
+            label="Description"
+            placeholder="Description"
             onChangeText={this.onChangeText}
             value={this.state.address}
             nameState="address"
           />
+          <Picker
+            onValueChange={(itemValue, itemIndex) =>
+              this.setState({categoryValue: itemValue})
+            }>
+            {this.state.dataSource.map((item, index) => {
+              return (
+                <Picker.Item
+                  label={item.categoryName}
+                  value={item.categoryName}
+                  key={index}
+                />
+              );
+            })}
+          </Picker>
+
           <TouchableOpacity
             style={styles.selectButton}
             onPress={this.selectImage}>
             <Text style={styles.buttonText}>Pick an image</Text>
           </TouchableOpacity>
-
-          {this.state.image !== null ? (
-            <Image
-              source={{uri: this.state.image.uri}}
-              style={styles.imageBox}
-            />
-          ) : null}
+          <View style={styles.imgcontainer}>
+            {this.state.image !== null ? (
+              <Image
+                source={{uri: this.state.image.uri}}
+                style={styles.imageBox}
+              />
+            ) : null}
+          </View>
           {this.state.uploading ? (
             <View style={styles.progressBarContainer}>
               <Progress.Bar progress={this.state.transferred} width={300} />
@@ -197,70 +197,57 @@ export default class Details extends Component {
             <TouchableOpacity
               style={styles.uploadButton}
               onPress={this.uploadImage}>
-              <Text style={styles.buttonText}>Upload Menu</Text>
+              <Text style={styles.buttonText}>Add Menu</Text>
             </TouchableOpacity>
           )}
-        </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  pages: {
+  container: {
     flex: 1,
     padding: 30,
   },
-
-  touch: {
+  selectButton: {
+    backgroundColor: 'grey',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  uploadButton: {
     backgroundColor: 'black',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
-  },
-  submit: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 16,
-  },
-
-  selectButton: {
-    borderRadius: 5,
-    width: 250,
-    height: 50,
-    backgroundColor: '#8ac6d1',
+    marginBottom: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 10,
-  },
-  uploadButton: {
-    margin: 10,
-    borderRadius: 5,
-    width: 250,
-    height: 50,
-    backgroundColor: '#ffb6b9',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
   },
   buttonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  imageContainer: {
-    marginTop: 30,
-    marginBottom: 50,
-    alignItems: 'center',
-  },
+
   progressBarContainer: {
     margin: 10,
   },
+
+  imgcontainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
   imageBox: {
-    backgroundColor: '#8ac6d1',
-    width: 250,
+    width: 100,
     height: 100,
     borderRadius: 5,
+    backgroundColor: '#D0D0D0',
   },
 });

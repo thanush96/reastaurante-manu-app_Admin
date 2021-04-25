@@ -7,7 +7,7 @@ const Stack = createStackNavigator();
 const Router = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Menus" component={Home} />
       <Stack.Screen name="Add" component={Add} />
       <Stack.Screen name="Details" component={Details} />
       <Stack.Screen name="Edit" component={Edit} />

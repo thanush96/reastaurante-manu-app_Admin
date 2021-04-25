@@ -1,38 +1,51 @@
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faEdit, faTimes} from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 const CardContact = ({id, contactItem, navigation, removeData}) => {
   return (
     <TouchableOpacity
-      style={styles.conatiner}
       onPress={() => {
         navigation.navigate('Details', {id: id});
       }}>
-      <View>
-        <Text style={styles.name}>{contactItem.name}</Text>
-        <Text style={styles.age}>{contactItem.age}</Text>
-        <Text style={styles.address}>{contactItem.address}</Text>
-      </View>
-      <View style={styles.icon}>
-        <FontAwesomeIcon
-          icon={faEdit}
-          color={'orange'}
-          size={25}
-          onPress={() => {
-            navigation.navigate('Edit', {id: id});
-          }}
-        />
-        <FontAwesomeIcon
-          icon={faTimes}
-          color={'red'}
-          size={25}
-          onPress={() => {
-            removeData(id);
-          }}
-        />
-      </View>
+      <LinearGradient
+        colors={['#63a4ff', '#045de9']}
+        style={styles.linearGradient}>
+        <View>
+          <Text style={styles.name}>{contactItem.name}</Text>
+          <Text style={styles.age}>{contactItem.age}</Text>
+          <Text style={styles.address}>{contactItem.address}</Text>
+          <Text style={styles.address}>{contactItem.category}</Text>
+        </View>
+        <View>
+          <Image
+            style={styles.img}
+            source={{
+              uri: contactItem.imgUrl,
+            }}
+          />
+        </View>
+        <View style={styles.icon}>
+          <FontAwesomeIcon
+            icon={faEdit}
+            color={'white'}
+            size={25}
+            onPress={() => {
+              navigation.navigate('Edit', {id: id});
+            }}
+          />
+          <FontAwesomeIcon
+            icon={faTimes}
+            color={'white'}
+            size={25}
+            onPress={() => {
+              removeData(id);
+            }}
+          />
+        </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 };
@@ -40,12 +53,12 @@ const CardContact = ({id, contactItem, navigation, removeData}) => {
 export default CardContact;
 
 const styles = StyleSheet.create({
-  conatiner: {
+  linearGradient: {
+    flex: 1,
     flexDirection: 'row',
     padding: 15,
-    backgroundColor: 'white',
-    borderRadius: 5,
-    marginBottom: 20,
+    borderRadius: 10,
+    marginBottom: 15,
     shadowColor: '#000',
     elevation: 5,
     shadowOffset: {
@@ -56,14 +69,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.85,
   },
-  name: {fontWeight: 'bold', fontSize: 16},
+  name: {fontWeight: 'bold', color: 'white', fontSize: 16, width: 100},
   age: {
     fontSize: 12,
-    color: 'gray',
+    color: 'white',
+    
   },
   address: {
     fontSize: 12,
-    color: 'gray',
+    color: 'white',
+  },
+
+  img: {
+    width: 100,
+    height: 100,
+    borderRadius: 5,
   },
 
   icon: {

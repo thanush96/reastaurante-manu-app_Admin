@@ -4,7 +4,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import menuRouter from './router/MenuRouter';
 import categoryRouter from './router/CategoryRouter';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faPlus} from '@fortawesome/free-solid-svg-icons';
+import {faHome, faList} from '@fortawesome/free-solid-svg-icons';
 
 const Tab = createBottomTabNavigator();
 
@@ -18,16 +18,16 @@ const BottomNavigator = () => {
           height: 50,
           borderTopWidth: 0,
           elevation: 0,
-          backgroundColor: '#ff0000',
+          backgroundColor: '#3399ff',
         },
         showLabel: true,
-        activeTintColor: '#ff0000',
+        activeTintColor: '#003300',
       }}>
       <Tab.Screen
         name="Home"
         component={menuRouter}
         options={{
-          tabBarIcon: ({color}) => <FontAwesomeIcon icon={faPlus} size={20} />,
+          tabBarIcon: ({color}) => <FontAwesomeIcon icon={faHome} size={20} />,
         }}
       />
 
@@ -35,7 +35,7 @@ const BottomNavigator = () => {
         name="category"
         component={categoryRouter}
         options={{
-          tabBarIcon: ({color}) => <FontAwesomeIcon icon={faPlus} size={20} />,
+          tabBarIcon: ({color}) => <FontAwesomeIcon icon={faList} size={20} />,
         }}
       />
     </Tab.Navigator>

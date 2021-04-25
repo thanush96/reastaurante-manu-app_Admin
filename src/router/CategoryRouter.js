@@ -7,7 +7,7 @@ const Stack = createStackNavigator();
 const CategoryRouter = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="categoryHome" component={categoryHome} />
+      <Stack.Screen name="Category" component={categoryHome} />
       <Stack.Screen name="categoryAdd" component={categoryAdd} />
       <Stack.Screen name="categoryEdit" component={categoryEdit} />
     </Stack.Navigator>

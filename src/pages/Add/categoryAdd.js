@@ -56,15 +56,15 @@ export default class Add extends Component {
     return (
       <View style={styles.pages}>
         <InputData
-          label="category Name"
-          placeholder="category Name here"
+          label="New Category Name"
+          placeholder="Category Name here"
           onChangeText={this.onChangeText}
           value={this.state.categoryName}
           nameState="categoryName"
         />
 
         <TouchableOpacity style={styles.touch} onPress={() => this.onSubmit()}>
-          <Text style={styles.submit}>Submit</Text>
+          <Text style={styles.submit}>Add</Text>
         </TouchableOpacity>
       </View>
     );
