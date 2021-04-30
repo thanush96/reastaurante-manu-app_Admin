@@ -2,9 +2,10 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import menuRouter from './router/MenuRouter';
+import BulkOrdersRouter from './router/bulkOrdersRouter';
 import categoryRouter from './router/CategoryRouter';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faHome, faList} from '@fortawesome/free-solid-svg-icons';
+import {faCookie, faHome, faList} from '@fortawesome/free-solid-svg-icons';
 
 const Tab = createBottomTabNavigator();
 
@@ -36,6 +37,14 @@ const BottomNavigator = () => {
         component={categoryRouter}
         options={{
           tabBarIcon: ({color}) => <FontAwesomeIcon icon={faList} size={20} />,
+        }}
+      />
+
+      <Tab.Screen
+        name="BulkOrders"
+        component={BulkOrdersRouter}
+        options={{
+          tabBarIcon: ({color}) => <FontAwesomeIcon icon={faCookie} size={20} />,
         }}
       />
     </Tab.Navigator>

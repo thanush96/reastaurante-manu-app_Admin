@@ -18,7 +18,6 @@ import * as Progress from 'react-native-progress';
 import {Picker} from '@react-native-picker/picker';
 import {LogBox} from 'react-native';
 
-
 export default class Edit extends Component {
   constructor(props) {
     super(props);
@@ -161,7 +160,7 @@ export default class Edit extends Component {
 
   render() {
     return (
-      <View style={styles.pages}>
+      <View style={styles.container}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <InputData
             label="name"
@@ -187,9 +186,9 @@ export default class Edit extends Component {
             value={this.state.address}
             nameState="address"
           />
-
+          <Text>Category</Text>
           <Picker
-            defaultValue="sgdgsfdgs"
+            defaultValue="Choose Category"
             onValueChange={(itemValue, itemIndex) =>
               this.setState({categoryValue: itemValue})
             }>
@@ -210,22 +209,15 @@ export default class Edit extends Component {
             <Text style={styles.buttonText}>Pick an image</Text>
           </TouchableOpacity>
           <View style={styles.imgcontainer}>
-
-          {this.state.imageurl !== null ? (
-            <Image
-              source={{uri: this.state.image.uri}}
-              style={styles.imageBox}
-            />
-          ) : (
-            <Image
-              style={styles.imageBox}
-              source={{
-                uri: this.state.imageurl,
-              }}
-            />
-          )}
+            {this.state.imageurl !== null ? (
+              <Image
+                source={{uri: this.state.image.uri}}
+                style={styles.imageBox}
+              />
+            ) : null}
           </View>
-          {/* {this.state.image !== null ? (
+          {/*           
+          {this.state.image !== null ? (
             <Image
               source={{uri: this.state.image.uri}}
               style={styles.imageBox}
@@ -257,39 +249,27 @@ export default class Edit extends Component {
 }
 
 const styles = StyleSheet.create({
-  pages: {
+  container: {
     flex: 1,
     padding: 30,
   },
-  touch: {
+  selectButton: {
+    backgroundColor: 'grey',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  uploadButton: {
     backgroundColor: 'black',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
-  },
-  submit: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 16,
-  },
-
-  selectButton: {
-    borderRadius: 5,
-    height: 50,
-    backgroundColor: '#63a4ff',
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 10,
-    marginTop: 10,
-  },
-  uploadButton: {
-    borderRadius: 5,
-    height: 50,
-    backgroundColor: '#4CAF50',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
   },
   buttonText: {
     color: 'white',
@@ -310,6 +290,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 5,
-    backgroundColor: '#63a4ff',
+    backgroundColor: '#D0D0D0',
   },
 });
+

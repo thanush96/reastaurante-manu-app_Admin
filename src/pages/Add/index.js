@@ -161,6 +161,7 @@ export default class Details extends Component {
             value={this.state.address}
             nameState="address"
           />
+          <Text>Category</Text>
           <Picker
             onValueChange={(itemValue, itemIndex) =>
               this.setState({categoryValue: itemValue})

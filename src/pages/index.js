@@ -5,6 +5,15 @@ import Edit from './EditContact';
 import categoryAdd from './Add/categoryAdd';
 import categoryHome from './Home/CategoryHome';
 import categoryEdit from './EditContact/categoryEdit';
+import BulkOrderHome from './Home/ShowBulkOrders';
 
-
-export {Home, Add, Details, Edit, categoryAdd, categoryHome,categoryEdit};
+export {
+  Home,
+  Add,
+  Details,
+  Edit,
+  categoryAdd,
+  categoryHome,
+  categoryEdit,
+  BulkOrderHome,
+};
