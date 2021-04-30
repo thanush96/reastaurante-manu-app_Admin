@@ -4,7 +4,7 @@
 
 import {AppRegistry} from 'react-native';
 import App from './App';
-// import App from './src/pages/Add/index';
+// import App from './src/pages/ContactDetails/index';
 // import App from './src/pages/Home/ShowBulkOrders';
 
 import {name as appName} from './app.json';

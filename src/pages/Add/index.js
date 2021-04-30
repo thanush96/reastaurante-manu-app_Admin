@@ -68,6 +68,9 @@ export default class Details extends Component {
         age: this.state.age,
         address: this.state.address,
         imgUrl: imageUrl,
+        BulkFoodStatus: 'Active',
+        MenuFoodStatus: 'Active',
+
       };
 
       AddContact.push(contact)
