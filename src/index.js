@@ -3,6 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import menuRouter from './router/MenuRouter';
 import BulkOrdersRouter from './router/bulkOrdersRouter';
+import SeatReservation from './router/SeatReservation';
 import categoryRouter from './router/CategoryRouter';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faCookie, faHome, faList} from '@fortawesome/free-solid-svg-icons';
@@ -44,7 +45,17 @@ const BottomNavigator = () => {
         name="BulkOrders"
         component={BulkOrdersRouter}
         options={{
-          tabBarIcon: ({color}) => <FontAwesomeIcon icon={faCookie} size={20} />,
+          tabBarIcon: ({color}) => (
+            <FontAwesomeIcon icon={faCookie} size={20} />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="SeatReservation"
+        component={SeatReservation}
+        options={{
+          tabBarIcon: ({color}) => <FontAwesomeIcon icon={faHome} size={20} />,
         }}
       />
     </Tab.Navigator>

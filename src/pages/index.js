@@ -6,6 +6,7 @@ import categoryAdd from './Add/categoryAdd';
 import categoryHome from './Home/CategoryHome';
 import categoryEdit from './EditContact/categoryEdit';
 import BulkOrderHome from './Home/ShowBulkOrders';
+import SeatReservationHome from './Home/SeatReservationHome';
 
 export {
   Home,
@@ -16,4 +17,5 @@ export {
   categoryHome,
   categoryEdit,
   BulkOrderHome,
+  SeatReservationHome,
 };

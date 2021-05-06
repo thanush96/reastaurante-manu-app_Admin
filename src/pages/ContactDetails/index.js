@@ -6,17 +6,54 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Switch,
 } from 'react-native';
 import FIREBASE from '../../config/FIREBASE';
 
 export default class Details extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       Foods: {},
+      MenuToggled: {},
+      BulkOrderToggled: {},
     };
   }
 
+  MenuToggleSwitch = value => {
+    this.setState({Menutoggled: value});
+    const UpdateBulkOrder = FIREBASE.database().ref(
+      'contact/' + this.props.route.params.id,
+    );
+    const MenuFoodsStatus = {
+      MenuFoodStatus: value,
+    };
+
+    UpdateBulkOrder.update(MenuFoodsStatus)
+      .then(data => {})
+
+      .catch(error => {
+        console.log('Error :', error);
+      });
+  };
+
+  BulOrderToggleSwitch = value => {
+    this.setState({BulkOrderToggled: value});
+    const UpdateBulkOrder = FIREBASE.database().ref(
+      'contact/' + this.props.route.params.id,
+    );
+    const BulkOrderStatus = {
+      BulkFoodStatus: value,
+    };
+
+    UpdateBulkOrder.update(BulkOrderStatus)
+      .then(data => {})
+
+      .catch(error => {
+        console.log('Error :', error);
+      });
+  };
   componentDidMount() {
     FIREBASE.database()
       .ref('contact/' + this.props.route.params.id)
@@ -27,85 +64,12 @@ export default class Details extends Component {
         this.setState({
           Foods: foodItem,
         });
-      });
-  }
 
-  ActiveBulkOrder() {
-    console.log('Hello');
-    const UpdateBulkOrder = FIREBASE.database().ref(
-      'contact/' + this.props.route.params.id,
-    );
-    const BulkOrderStatus = {
-      BulkFoodStatus: 'Active',
-    };
-
-    UpdateBulkOrder.update(BulkOrderStatus)
-      .then(data => {
-        Alert.alert('Success', 'Activated');
-        this.componentDidMount();
-      })
-
-      .catch(error => {
-        console.log('Error :', error);
-      });
-  }
-
-  InactiveBulkOrder() {
-    console.log('Hello');
-    const UpdateBulkOrder = FIREBASE.database().ref(
-      'contact/' + this.props.route.params.id,
-    );
-    const BulkOrderStatus = {
-      BulkFoodStatus: 'Inactive',
-    };
-
-    UpdateBulkOrder.update(BulkOrderStatus)
-      .then(data => {
-        Alert.alert('Success', 'Inactivated');
-        this.componentDidMount();
-      })
-
-      .catch(error => {
-        console.log('Error :', error);
-      });
-  }
-  MenuActive() {
-    console.log('Hello');
-    const UpdateBulkOrder = FIREBASE.database().ref(
-      'contact/' + this.props.route.params.id,
-    );
-    const BulkOrderStatus = {
-      MenuFoodStatus: 'Active',
-    };
-
-    UpdateBulkOrder.update(BulkOrderStatus)
-      .then(data => {
-        Alert.alert('Success', 'Activated');
-        this.componentDidMount();
-      })
-
-      .catch(error => {
-        console.log('Error :', error);
-      });
-  }
-
-  MenuInactive() {
-    console.log('Hello');
-    const UpdateBulkOrder = FIREBASE.database().ref(
-      'contact/' + this.props.route.params.id,
-    );
-    const BulkOrderStatus = {
-      MenuFoodStatus: 'Inactive',
-    };
-
-    UpdateBulkOrder.update(BulkOrderStatus)
-      .then(data => {
-        Alert.alert('Success', 'Inactivated');
-        this.componentDidMount();
-      })
-
-      .catch(error => {
-        console.log('Error :', error);
+        const {Foods} = this.state;
+        this.setState({
+          MenuToggled: Foods.MenuFoodStatus,
+          BulkOrderToggled: Foods.BulkFoodStatus,
+        });
       });
   }
 
@@ -116,33 +80,18 @@ export default class Details extends Component {
         <Text>{Foods.name}</Text>
         <Text>Rs :{Foods.age}</Text>
         <Text>{Foods.address}</Text>
-        {Foods.BulkFoodStatus == 'Active' ? (
-          <TouchableOpacity
-            style={styles.touch}
-            onPress={() => this.InactiveBulkOrder()}>
-            <Text style={styles.submit}>Inactive Order</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.touch}
-            onPress={() => this.ActiveBulkOrder()}>
-            <Text style={styles.submit}>Active Order</Text>
-          </TouchableOpacity>
-        )}
 
-        {Foods.MenuFoodStatus == 'Active' ? (
-          <TouchableOpacity
-            style={styles.touch}
-            onPress={() => this.MenuInactive()}>
-            <Text style={styles.submit}>Inactive Menu</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.touch}
-            onPress={() => this.MenuActive()}>
-            <Text style={styles.submit}>Active Menu</Text>
-          </TouchableOpacity>
-        )}
+        <Text>Bulk Order Availablity</Text>
+        <Switch
+          onValueChange={this.BulOrderToggleSwitch}
+          value={this.state.BulkOrderToggled}
+        />
+
+        <Text>Availablity</Text>
+        <Switch
+          onValueChange={this.MenuToggleSwitch}
+          value={this.state.MenuToggled}
+        />
       </View>
     );
   }
