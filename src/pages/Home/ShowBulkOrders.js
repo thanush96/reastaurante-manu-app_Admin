@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
+  RefreshControl,
   Button,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -20,11 +21,13 @@ export default class BulkOrderHome extends Component {
     this.state = {
       orders: {},
       ordersKey: [],
+      refreshing: false,
     };
   }
 
   componentDidMount() {
     this.MountData();
+    console.log('BulkOrders Mounting....');
   }
 
   MountData() {
@@ -37,23 +40,29 @@ export default class BulkOrderHome extends Component {
         this.setState({
           orders: bulkItem,
           ordersKey: Object.keys(bulkItem),
+          refreshing: false,
         });
       });
   }
 
-  render() {
-    // console.log('contact : ', this.state.contact);
-    // console.log('contactKey : ', this.state.contactKey);
+  // REFRESH FUNCTION
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    this.componentDidMount();
+  };
 
+  render() {
     const {orders, ordersKey} = this.state;
     return (
       <View style={styles.page}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {/* <View style={styles.header}>
-            <Text style={styles.title}>Menu</Text>
-            <View style={styles.grid} />
-          </View> */}
-
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh}
+            />
+          }>
           <View style={styles.listContact}>
             {ordersKey.length > 0 ? (
               ordersKey.map(key => (

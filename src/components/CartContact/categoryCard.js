@@ -8,7 +8,7 @@ const CategoryCard = ({id, categoryItem, navigation, removeData}) => {
   return (
     <View style={styles.conatiner}>
       <LinearGradient
-        colors={['#63a4ff', '#045de9']}
+        colors={['#045de9', '#045de9']}
         style={styles.linearGradient}>
         {/* onPress=
       {() => {
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     padding: 15,
-    borderRadius: 3,
+    borderRadius: 15,
     marginBottom: 15,
     shadowColor: '#000',
     elevation: 5,

@@ -4,9 +4,9 @@ import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const SeatReservationCard = ({id, bulkItem, navigation}) => {
+const SeatReservationCard = ({id, seatReservation, reserved}) => {
   return (
-    <TouchableOpacity
+    <View
     // onPress={() => {
     //   navigation.navigate('Details', {id: id});
     // }}
@@ -15,44 +15,47 @@ const SeatReservationCard = ({id, bulkItem, navigation}) => {
         colors={['#63a4ff', '#045de9']}
         style={styles.linearGradient}>
         <View>
-          <Text style={styles.CardTitleText}>{bulkItem.OrderedFood}</Text>
+          <Text style={styles.CardTitleText}>OTP - {seatReservation.otp}</Text>
+
+          <Text style={styles.CardText}>Seat : {seatReservation.Seat}</Text>
+
           <Text style={styles.CardText}>
-            Name : {bulkItem.NumberOfParcels}
+            Booking Seat for : {seatReservation.GiveDate}
           </Text>
           <Text style={styles.CardText}>
-            Delevery Date : {bulkItem.GiveDate}
+            Customer Name : {seatReservation.CustomerName}
           </Text>
           <Text style={styles.CardText}>
-            Customer Name : {bulkItem.CustomerName}
+            Mobile : {seatReservation.CustomerContactNo}
           </Text>
           <Text style={styles.CardText}>
-            Mobile : {bulkItem.CustomerContactNo}
-          </Text>
-          <Text style={styles.CardText}>
-            Ordered date : {bulkItem.OrderderedDate}
+            Ordered date : {seatReservation.OrderderedDate}
           </Text>
         </View>
 
-        {/* <View style={styles.icon}>
-          <FontAwesomeIcon
+        <View style={styles.icon}>
+          {/* <FontAwesomeIcon
             icon={faEdit}
             color={'white'}
             size={25}
             onPress={() => {
               navigation.navigate('Edit', {id: id});
             }}
-          />
-          <FontAwesomeIcon
+          /> */}
+          {/* <FontAwesomeIcon
             icon={faTimes}
             color={'white'}
             size={25}
             onPress={() => {
-              removeData(id);
+              reserved(id);
             }}
-          />
-        </View> */}
+          /> */}
+        </View>
       </LinearGradient>
-    </TouchableOpacity>
+      <TouchableOpacity style={styles.touch} onPress={() => reserved(id)}>
+        <Text style={styles.submit}>DONE</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -63,8 +66,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    marginBottom: 1,
     shadowColor: '#000',
     elevation: 5,
     shadowOffset: {
@@ -78,12 +82,14 @@ const styles = StyleSheet.create({
   CardTitleText: {
     fontWeight: 'bold',
     color: 'white',
-    fontSize: 25,
+    fontSize: 27,
+    textAlign: 'center',
   },
 
   CardText: {
-    fontSize: 14,
+    fontSize: 17,
     color: 'white',
+    marginTop: 10,
   },
 
   icon: {
@@ -91,5 +97,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
+  },
+
+  touch: {
+    backgroundColor: 'green',
+    padding: 10,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+  },
+  submit: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 16,
   },
 });

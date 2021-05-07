@@ -11,15 +11,20 @@ import {
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faPlus} from '@fortawesome/free-solid-svg-icons';
 import FIREBASE from '../../config/FIREBASE';
-import BulkOrderCard from '../../components/CartContact/bulkOrderCard';
+import SeatReservationCard from '../../components/CartContact/SeatReservationCard';
+import OtpInputData from '../../components/InputData/otpInputBox';
+import CustomAlert from '../../components/Alert/deleteAlert';
 
 export default class BulkOrderHome extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      orders: {},
-      ordersKey: [],
+      reservations: {},
+      reservationKey: [],
+      userOtp: '',
+      showAlert: false,
+      getId: '',
     };
   }
 
@@ -29,47 +34,125 @@ export default class BulkOrderHome extends Component {
 
   MountData() {
     FIREBASE.database()
-      .ref('BulkOrders')
+      .ref('Seat_Reservation')
       .once('value', querySnapShot => {
         let data = querySnapShot.val() ? querySnapShot.val() : {};
-        let bulkItem = {...data};
+        let reservatedSeats = {...data};
 
         this.setState({
-          orders: bulkItem,
-          ordersKey: Object.keys(bulkItem),
+          reservations: reservatedSeats,
+          reservationKey: Object.keys(reservatedSeats),
         });
+
+        this.state.reservationKey.map(key =>
+          // console.log(this.state.reservations[key].otp),
+          this.setState({storedOtp: this.state.reservations[key].otp}),
+        );
       });
   }
 
+  onChangeText = (nameState, Value) => {
+    this.setState({
+      [nameState]: Value,
+    });
+  };
+
+  // OTP FEILD RESET AND ACCESS
+  reset = () => {
+    this.setState({
+      reservations: {},
+      reservationKey: [],
+      userOtp: '',
+    });
+
+    this.MountData();
+  };
+
+  // ALERT FUNCTIONS
+  showAlert = id => {
+    this.setState({
+      showAlert: true,
+      getId: id,
+    });
+  };
+
+  confirmAlert = () => {
+    console.log('confirmAlert', this.state.getId);
+    // WRITE UPDATE FUNCTION
+    const AddStatus = FIREBASE.database().ref(
+      'Seat_Reservation/' + this.state.getId,
+    );
+    const status = {
+      status: false,
+    };
+
+    AddStatus.update(status);
+    this.reset();
+
+    this.setState({
+      showAlert: false,
+    });
+  };
+
+  hideAlert = () => {
+    console.log('hide');
+    this.setState({
+      showAlert: false,
+    });
+  };
+
   render() {
-    // console.log('contact : ', this.state.contact);
-    // console.log('contactKey : ', this.state.contactKey);
+    const {reservations, reservationKey, showAlert} = this.state;
 
-    const {orders, ordersKey} = this.state;
     return (
-      <View style={styles.page}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {/* <View style={styles.header}>
-            <Text style={styles.title}>Menu</Text>
-            <View style={styles.grid} />
-          </View> */}
+      <View keyboardShouldPersistTaps="handled">
+        <View style={styles.otpInputBox}>
+          <OtpInputData
+            placeholder="______"
+            onChangeText={this.onChangeText}
+            value={this.state.userOtp}
+            nameState="userOtp"
+            keyboardType="number-pad"
+          />
+        </View>
 
-          <View style={styles.listContact}>
-            {ordersKey.length > 0 ? (
-              ordersKey.map(key => (
-                <BulkOrderCard
-                  key={key}
-                  bulkItem={orders[key]}
-                  id={key}
-                  {...this.props}
-                  // removeData={this.removeData}
-                />
-              ))
-            ) : (
-              <Text>No Orders</Text>
-            )}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.page}>
+            {reservationKey.length > 0
+              ? reservationKey.map(key =>
+                  reservations[key].otp == this.state.userOtp &&
+                  reservations[key].status == true ? (
+                    <SeatReservationCard
+                      key={key}
+                      seatReservation={reservations[key]}
+                      id={key}
+                      {...this.props}
+                      reserved={this.showAlert}
+                    />
+                  ) : null,
+                )
+              : null}
           </View>
         </ScrollView>
+
+        <View style={styles.otpInputBox}>
+          <TouchableOpacity
+            style={styles.touch}
+            onPress={() => this.reset()}
+            keyboardShouldPersistTaps={'always'}>
+          <Text style={styles.submit}>RESET OTP</Text>
+          </TouchableOpacity>
+        </View>
+
+        <CustomAlert
+          title="Cofirmation"
+          message="Are you sure for access"
+          confirmText="Yes"
+          {...this.props}
+          hideAlert={this.hideAlert}
+          showAlert={showAlert}
+          confirmAlert={this.confirmAlert}
+        />
       </View>
     );
   }
@@ -77,7 +160,15 @@ export default class BulkOrderHome extends Component {
 
 const styles = StyleSheet.create({
   page: {
-    flex: 1,
+    flex: 0,
+    paddingHorizontal: 20,
+    marginTop: 50,
+  },
+
+  otpInputBox: {
+    marginTop: 50,
+    alignItems: 'stretch',
+    paddingHorizontal: 70,
   },
 
   header: {
@@ -119,5 +210,29 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+
+  touch: {
+    backgroundColor: 'black',
+    padding: 10,
+    borderRadius: 5,
+  },
+  submit: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 16,
+  },
+
+  button: {
+    margin: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 5,
+    backgroundColor: '#AEDEF4',
+  },
+  text: {
+    color: '#fff',
+    fontSize: 15,
   },
 });

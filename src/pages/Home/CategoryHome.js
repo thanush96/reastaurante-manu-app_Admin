@@ -1,9 +1,18 @@
 import React, {Component} from 'react';
-import {Text, TouchableOpacity, View, StyleSheet, Alert,ScrollView} from 'react-native';
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faPlus} from '@fortawesome/free-solid-svg-icons';
 import FIREBASE from '../../config/FIREBASE';
 import CategoryCard from '../../components/CartContact/categoryCard';
+import CustomAlert from '../../components/Alert/deleteAlert';
 
 export default class CategoryHome extends Component {
   constructor(props) {
@@ -12,11 +21,15 @@ export default class CategoryHome extends Component {
     this.state = {
       category: {},
       categoryKey: [],
+      showAlert: false,
+      getId: '',
+      refreshing: false,
     };
   }
 
   componentDidMount() {
     this.MountData();
+    console.log('Catrgory Mounting....');
   }
 
   MountData() {
@@ -29,70 +42,99 @@ export default class CategoryHome extends Component {
         this.setState({
           category: categoryItem,
           categoryKey: Object.keys(categoryItem),
+          refreshing: false,
         });
       });
   }
 
-  removeData = id => {
-    Alert.alert(
-      'Alert Title',
-      'My Alert Msg',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'ok',
-          onPress: () => {
-            FIREBASE.database()
-              .ref('categories/' + id)
-              .remove();
-            this.MountData();
+  // removeData = id => {
+  //   Alert.alert(
+  //     'Alert Title',
+  //     'My Alert Msg',
+  //     [
+  //       {
+  //         text: 'Cancel',
+  //         onPress: () => console.log('Cancel Pressed'),
+  //         style: 'cancel',
+  //       },
+  //       {
+  //         text: 'ok',
+  //         onPress: () => {
+  //           FIREBASE.database()
+  //             .ref('categories/' + id)
+  //             .remove();
+  //           this.MountData();
 
-            Alert.alert('Succes', 'Deleted');
-          },
-          style: 'cancel',
-        },
-      ],
-      {
-        cancelable: false,
-      },
-    );
+  //           Alert.alert('Succes', 'Deleted');
+  //         },
+  //         style: 'cancel',
+  //       },
+  //     ],
+  //     {
+  //       cancelable: false,
+  //     },
+  //   );
+  // };
+
+  // ALERT FUNCTIONS
+  showAlert = id => {
+    this.setState({
+      showAlert: true,
+      getId: id,
+    });
+  };
+
+  confirmAlert = () => {
+    console.log('confirmAlert');
+    FIREBASE.database()
+      .ref('categories/' + this.state.getId)
+      .remove();
+    this.MountData();
+    this.setState({
+      showAlert: false,
+    });
+  };
+
+  hideAlert = () => {
+    console.log('hide');
+    this.setState({
+      showAlert: false,
+    });
+  };
+
+  // REFRESH FUNCTION
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    this.componentDidMount();
   };
 
   render() {
-    // console.log('contact : ', this.state.contact);
-    // console.log('contactKey : ', this.state.contactKey);
-
-    const {category, categoryKey} = this.state;
+    const {category, categoryKey,showAlert} = this.state;
     return (
-      
       <View style={styles.page}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-
-        {/* <View style={styles.header}>
-          <Text style={styles.title}>Category</Text>
-          <View style={styles.grid} />
-        </View> */}
-
-        <View style={styles.listContact}>
-          {categoryKey.length > 0 ? (
-            categoryKey.map(key => (
-              <CategoryCard
-                key={key}
-                categoryItem={category[key]}
-                id={key}
-                {...this.props}
-                removeData={this.removeData}
-              />
-            ))
-          ) : (
-            <Text>No Items</Text>
-          )}
-        </View>
-        
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh}
+            />
+          }>
+          <View style={styles.listContact}>
+            {categoryKey.length > 0 ? (
+              categoryKey.map(key => (
+                <CategoryCard
+                  key={key}
+                  categoryItem={category[key]}
+                  id={key}
+                  {...this.props}
+                  removeData={this.showAlert}
+                />
+              ))
+            ) : (
+              <Text>No Items</Text>
+            )}
+          </View>
         </ScrollView>
         <View style={styles.wrapperButton}>
           <TouchableOpacity
@@ -101,6 +143,17 @@ export default class CategoryHome extends Component {
             <FontAwesomeIcon icon={faPlus} size={20} />
           </TouchableOpacity>
         </View>
+
+        {/* DELETE CONFORMATION ALERT */}
+        <CustomAlert
+          title="Category Delete"
+          message="Are you sure for delete"
+          confirmText="Yes, Delete"
+          {...this.props}
+          hideAlert={this.hideAlert}
+          showAlert={showAlert}
+          confirmAlert={this.confirmAlert}
+        />
       </View>
     );
   }

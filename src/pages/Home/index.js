@@ -1,9 +1,18 @@
 import React, {Component} from 'react';
-import {Text, TouchableOpacity, View, StyleSheet, Alert,ScrollView} from 'react-native';
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faPlus} from '@fortawesome/free-solid-svg-icons';
 import FIREBASE from '../../config/FIREBASE';
 import {CardContact} from '../../components';
+import CustomAlert from '../../components/Alert/deleteAlert';
 
 export default class Home extends Component {
   constructor(props) {
@@ -12,11 +21,15 @@ export default class Home extends Component {
     this.state = {
       contact: {},
       contactKey: [],
+      showAlert: false,
+      getId: '',
+      refreshing: false,
     };
   }
 
   componentDidMount() {
     this.MountData();
+    console.log('Menu Mounting....');
   }
 
   MountData() {
@@ -29,69 +42,72 @@ export default class Home extends Component {
         this.setState({
           contact: contactItem,
           contactKey: Object.keys(contactItem),
+          refreshing: false,
         });
       });
   }
 
-  removeData = id => {
-    Alert.alert(
-      'Alert Title',
-      'My Alert Msg',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'ok',
-          onPress: () => {
-            FIREBASE.database()
-              .ref('contact/' + id)
-              .remove();
-            this.MountData();
+  // ALERT FUNCTIONS
+  showAlert = id => {
+    this.setState({
+      showAlert: true,
+      getId: id,
+    });
+  };
 
-            Alert.alert('Succes', 'Deleted');
-          },
-          style: 'cancel',
-        },
-      ],
-      {
-        cancelable: false,
-      },
-    );
+  confirmAlert = () => {
+    console.log('confirmAlert', this.state.getId);
+    // WRITE DELETE FUNCTION
+    FIREBASE.database()
+      .ref('contact/' + this.state.getId)
+      .remove();
+    this.MountData();
+
+    this.setState({
+      showAlert: false,
+    });
+  };
+
+  hideAlert = () => {
+    console.log('hide');
+    this.setState({
+      showAlert: false,
+    });
+  };
+
+  // REFRESH FUNCTION
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    this.componentDidMount();
   };
 
   render() {
-    // console.log('contact : ', this.state.contact);
-    // console.log('contactKey : ', this.state.contactKey);
-
-    const {contact, contactKey} = this.state;
+    const {contact, contactKey, showAlert} = this.state;
     return (
       <View style={styles.page}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-
-        {/* <View style={styles.header}>
-          <Text style={styles.title}>Menu</Text>
-          <View style={styles.grid} />
-        </View> */}
-
-        <View style={styles.listContact}>
-          {contactKey.length > 0 ? (
-            contactKey.map(key => (
-              <CardContact
-                key={key}
-                contactItem={contact[key]}
-                id={key}
-                {...this.props}
-                removeData={this.removeData}
-              />
-            ))
-          ) : (
-            <Text>No Items</Text>
-
-          )}
-        </View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh}
+            />
+          }>
+          <View style={styles.listContact}>
+            {contactKey.length > 0 ? (
+              contactKey.map(key => (
+                <CardContact
+                  key={key}
+                  contactItem={contact[key]}
+                  id={key}
+                  {...this.props}
+                  removeData={this.showAlert}
+                />
+              ))
+            ) : (
+              <Text>No Items</Text>
+            )}
+          </View>
         </ScrollView>
 
         <View style={styles.wrapperButton}>
@@ -101,6 +117,15 @@ export default class Home extends Component {
             <FontAwesomeIcon icon={faPlus} size={20} />
           </TouchableOpacity>
         </View>
+        <CustomAlert
+          title="DELETE"
+          message="Are you sure for Delete"
+          confirmText="Yes, Delete"
+          {...this.props}
+          hideAlert={this.hideAlert}
+          showAlert={showAlert}
+          confirmAlert={this.confirmAlert}
+        />
       </View>
     );
   }

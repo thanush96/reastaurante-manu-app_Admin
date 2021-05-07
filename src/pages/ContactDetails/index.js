@@ -22,7 +22,7 @@ export default class Details extends Component {
   }
 
   MenuToggleSwitch = value => {
-    this.setState({Menutoggled: value});
+    this.setState({MenuToggled: value});
     const UpdateBulkOrder = FIREBASE.database().ref(
       'contact/' + this.props.route.params.id,
     );
