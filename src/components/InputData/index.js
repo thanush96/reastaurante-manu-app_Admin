@@ -13,7 +13,7 @@ const InputData = ({
     <>
       <Text style={styles.label}>{label} </Text>
       <TextInput
-        placeholderTextColor="#202020"
+        placeholderTextColor="grey"
         placeholder={placeholder}
         style={styles.textInput}
         keyboardType={keyboardType}
@@ -30,12 +30,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 5,
+    color: 'white',
   },
 
   textInput: {
     borderWidth: 1,
-    borderColor: 'grey',
-    color: 'black',
+    borderColor: 'white',
+    color: 'white',
     borderRadius: 5,
     marginBottom: 10,
   },

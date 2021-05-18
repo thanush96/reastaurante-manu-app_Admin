@@ -13,6 +13,7 @@ import {faPlus} from '@fortawesome/free-solid-svg-icons';
 import FIREBASE from '../../config/FIREBASE';
 import CategoryCard from '../../components/CartContact/categoryCard';
 import CustomAlert from '../../components/Alert/deleteAlert';
+import COLORS from '../../components/colors/color';
 
 export default class CategoryHome extends Component {
   constructor(props) {
@@ -193,7 +194,7 @@ const styles = StyleSheet.create({
 
   btn: {
     padding: 20,
-    backgroundColor: '#3399ff',
+    backgroundColor: COLORS.secondary,
     borderRadius: 30,
     shadowColor: '#000',
     shadowOffset: {

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useState, Component} from 'react';
 import {
   Button,
   Text,
@@ -7,12 +7,16 @@ import {
   StyleSheet,
   Alert,
   Switch,
+  Image,
+  Dimensions,
 } from 'react-native';
 import FIREBASE from '../../config/FIREBASE';
 
 export default class Details extends Component {
   constructor(props) {
     super(props);
+
+    // console.log(Dimensions.get('window').width);
 
     this.state = {
       Foods: {},
@@ -75,43 +79,78 @@ export default class Details extends Component {
 
   render() {
     const {Foods} = this.state;
+
     return (
-      <View style={styles.pages}>
-        <Text>{Foods.name}</Text>
-        <Text>Rs :{Foods.age}</Text>
-        <Text>{Foods.address}</Text>
-
-        <Text>Bulk Order Availablity</Text>
-        <Switch
-          onValueChange={this.BulOrderToggleSwitch}
-          value={this.state.BulkOrderToggled}
+      <View>
+        <Image
+          style={styles.img}
+          source={{
+            uri: Foods.imgUrl,
+          }}
         />
-
-        <Text>Availablity</Text>
-        <Switch
-          onValueChange={this.MenuToggleSwitch}
-          value={this.state.MenuToggled}
-        />
+        <View style={styles.header}>
+          <Text style={styles.items}>{Foods.name}</Text>
+          <Text style={styles.description}>Rs :{Foods.unitPrice}</Text>
+          <Text style={styles.description}>{Foods.description}</Text>
+        </View>
+        <View style={styles.switchContainer}>
+          <View style={styles.switchRow}>
+            <Text style={styles.switchText}>Show in Bulk Order</Text>
+            <Switch
+              onValueChange={this.BulOrderToggleSwitch}
+              value={this.state.BulkOrderToggled}
+            />
+          </View>
+          <View style={styles.switchRow}>
+            <Text style={styles.switchText}>Show in Menu</Text>
+            <Switch
+              onValueChange={this.MenuToggleSwitch}
+              value={this.state.MenuToggled}
+            />
+          </View>
+        </View>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  pages: {
-    flex: 1,
-    padding: 30,
-  },
-  touch: {
-    backgroundColor: 'black',
+  header: {
+    backgroundColor: 'rgba(4, 6, 31, 0.75)',
+    borderRadius: 20,
     padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
+    marginHorizontal: 20,
+    top: -50,
   },
-  submit: {
+
+  switchContainer: {
+    backgroundColor: 'rgba(4, 6, 31, 0.75)',
+    borderRadius: 20,
+    padding: 10,
+    marginHorizontal: 20,
+    top:-20
+  },
+
+  img: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').width,
+  },
+  items: {
     color: 'white',
-    fontWeight: 'bold',
+    fontSize: 30,
     textAlign: 'center',
-    fontSize: 16,
+  },
+
+  switchText: {fontSize: 14, padding: 10, color: 'white'},
+
+  description: {
+    color: 'white',
+    fontSize: 15,
+    textAlign: 'center',
+  },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });

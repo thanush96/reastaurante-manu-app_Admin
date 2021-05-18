@@ -13,6 +13,7 @@ import {faPlus} from '@fortawesome/free-solid-svg-icons';
 import FIREBASE from '../../config/FIREBASE';
 import {CardContact} from '../../components';
 import CustomAlert from '../../components/Alert/deleteAlert';
+import COLORS from '../../components/colors/color';
 
 export default class Home extends Component {
   constructor(props) {
@@ -83,6 +84,7 @@ export default class Home extends Component {
 
   render() {
     const {contact, contactKey, showAlert} = this.state;
+    // console.log(this.props.navigation)
     return (
       <View style={styles.page}>
         <ScrollView
@@ -165,7 +167,7 @@ const styles = StyleSheet.create({
 
   btn: {
     padding: 20,
-    backgroundColor: '#3399ff',
+    backgroundColor: COLORS.secondary,
     borderRadius: 30,
     shadowColor: '#000',
     shadowOffset: {

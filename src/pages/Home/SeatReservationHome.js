@@ -14,6 +14,8 @@ import FIREBASE from '../../config/FIREBASE';
 import SeatReservationCard from '../../components/CartContact/SeatReservationCard';
 import OtpInputData from '../../components/InputData/otpInputBox';
 import CustomAlert from '../../components/Alert/deleteAlert';
+import COLORS from '../../components/colors/color';
+
 
 export default class BulkOrderHome extends Component {
   constructor(props) {
@@ -108,7 +110,7 @@ export default class BulkOrderHome extends Component {
       <View keyboardShouldPersistTaps="handled">
         <View style={styles.otpInputBox}>
           <OtpInputData
-            placeholder="______"
+            placeholder=""
             onChangeText={this.onChangeText}
             value={this.state.userOtp}
             nameState="userOtp"
@@ -213,24 +215,17 @@ const styles = StyleSheet.create({
   },
 
   touch: {
-    backgroundColor: 'black',
+    backgroundColor: 'red',
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 50,
   },
   submit: {
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 14,
   },
 
-  button: {
-    margin: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 5,
-    backgroundColor: '#AEDEF4',
-  },
   text: {
     color: '#fff',
     fontSize: 15,

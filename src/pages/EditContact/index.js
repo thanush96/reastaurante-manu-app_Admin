@@ -9,6 +9,7 @@ import {
   Alert,
   Image,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import {InputData} from '../../components';
 import FIREBASE from '../../config/FIREBASE';
@@ -16,7 +17,9 @@ import ImagePicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import * as Progress from 'react-native-progress';
 import {Picker} from '@react-native-picker/picker';
-import {LogBox} from 'react-native';
+import COLORS from '../../components/colors/color';
+import WarningMessage from '../../components/Alert/warningMessage';
+// import {LogBox} from 'react-native';
 
 export default class Edit extends Component {
   constructor(props) {
@@ -24,14 +27,17 @@ export default class Edit extends Component {
 
     this.state = {
       name: '',
-      age: '',
-      address: '',
+      unitPrice: '',
+      description: '',
       image: '',
       imageurl: null,
       categoryValue: '',
       uploading: false,
+      imageChoosed: false,
       transferred: 0,
       dataSource: [],
+      showAlert: false,
+      successAlertMsg: false,
     };
   }
   async get_firebase_list() {
@@ -63,11 +69,12 @@ export default class Edit extends Component {
 
         this.setState({
           name: contactItem.name,
-          age: contactItem.age,
-          address: contactItem.address,
+          unitPrice: contactItem.unitPrice,
+          description: contactItem.description,
           imageurl: contactItem.imgUrl,
-          categoryValue: contactItem.categoryName,
+          categoryValue: contactItem.category,
         });
+        // console.log(this.state.categoryValue);
       });
   }
 
@@ -78,32 +85,30 @@ export default class Edit extends Component {
   };
 
   onSubmit = imageUrl => {
-    if (this.state.name && this.state.age && this.state.address) {
-      const AddContact = FIREBASE.database().ref(
-        'contact/' + this.props.route.params.id,
-      );
-      const contact = {
-        name: this.state.name,
-        category: this.state.categoryValue,
-        age: this.state.age,
-        address: this.state.address,
-        imgUrl: imageUrl,
-      };
+    const AddContact = FIREBASE.database().ref(
+      'contact/' + this.props.route.params.id,
+    );
+    const contact = {
+      name: this.state.name,
+      category: this.state.categoryValue,
+      unitPrice: this.state.unitPrice,
+      description: this.state.description,
+      imgUrl: imageUrl,
+    };
 
-      AddContact.update(contact)
-        .then(data => {
-          Alert.alert('Success', 'Contact updated');
-        })
+    AddContact.update(contact)
+      .then(data => {
+        // CUSTOM ALERT MESSAGE
+        this.successShowAlert();
+        console.log('updated');
+      })
 
-        .catch(error => {
-          console.log('Error :', error);
-        });
+      .catch(error => {
+        console.log('Error :', error);
+      });
 
-      console.log('Added');
-      console.log(this.state);
-    } else {
-      Alert.alert('Error', 'Please Input here');
-    }
+    // console.log('onSubmit Fuction');
+    // console.log(this.state);
   };
 
   selectImage = () => {
@@ -124,99 +129,184 @@ export default class Edit extends Component {
         console.log('User tapped custom button: ', response.customButton);
       } else {
         const source = {uri: response.uri};
-        this.setState({image: source});
+        this.setState({image: source, imageChoosed: true});
       }
     });
   };
 
   uploadImage = async () => {
+    console.log(this.state.categoryValue);
     const {uri} = this.state.image;
-    const filename = uri.substring(uri.lastIndexOf('/') + 1);
-    const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
-    this.setState({uploading: true});
-    this.setState({transferred: 0});
-    const task = storage().ref(filename).putFile(uploadUri);
-    // set progress state
-    task.on('state_changed', snapshot => {
-      this.setState({
-        transferred:
-          Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 10000,
-      });
-    });
-    try {
-      await task;
-      const imageRef = storage().ref(filename);
-      const url = await imageRef.getDownloadURL();
-      console.log(url);
-      this.onSubmit(url);
-    } catch (e) {
-      console.error(e);
+    if (this.state.imageChoosed) {
+      if (
+        this.state.name &&
+        this.state.unitPrice &&
+        this.state.description &&
+        this.state.categoryValue &&
+        !isNaN(this.state.unitPrice)
+      ) {
+        console.log('imageChoosed!');
+        const filename = uri.substring(uri.lastIndexOf('/') + 1);
+        const uploadUri =
+          Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+        this.setState({uploading: true});
+        this.setState({transferred: 0});
+        const task = storage().ref(filename).putFile(uploadUri);
+        // set progress state
+        task.on('state_changed', snapshot => {
+          this.setState({
+            transferred:
+              Math.round(snapshot.bytesTransferred / snapshot.totalBytes) *
+              10000,
+          });
+        });
+        try {
+          await task;
+          const imageRef = storage().ref(filename);
+          const url = await imageRef.getDownloadURL();
+          console.log(url);
+          this.onSubmit(url);
+        } catch (e) {
+          console.error(('error', e));
+        }
+        this.setState({uploading: false, imageChoosed: false});
+        // console.log('menu update with image!');
+      } else {
+        // CUSTOM VALIDATION WARNING MESSAGE
+        this.showAlert();
+        console.log('Please input feild');
+      }
+    } else {
+      // console.log('menu without image');
+      // this.onSubmit(this.state.imageurl);
+      if (
+        this.state.name &&
+        this.state.unitPrice &&
+        this.state.description &&
+        this.state.categoryValue &&
+        !isNaN(this.state.unitPrice)
+      ) {
+        // console.log('menu update');
+        this.onSubmit(this.state.imageurl);
+      } else {
+        // CUSTOM VALIDATION WARNING MESSAGE
+        this.showAlert();
+        console.log('Please input feild');
+      }
     }
-    this.setState({uploading: false});
+    // this.setState({image: null});
+  };
 
-    Alert.alert('Menu uploaded!', 'Your menu has been uploaded!');
-    this.setState({image: null});
+  // ALERT FUNCTIONS
+  showAlert = () => {
+    this.setState({
+      showAlert: true,
+    });
+  };
+
+  hideAlert = () => {
+    this.setState({
+      showAlert: false,
+    });
+  };
+
+  // SUCCESSFULL ALERT FUNCTIONS
+  successShowAlert = () => {
+    this.setState({
+      successAlertMsg: true,
+    });
+  };
+
+  hideAlertSuccessMsg = () => {
+    this.setState({
+      successAlertMsg: false,
+    });
+    this.props.navigation.navigate('Menus');
+
   };
 
   render() {
+    const {showAlert, successAlertMsg} = this.state;
+
     return (
-      <View style={styles.container}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <InputData
-            label="name"
-            placeholder="Name here"
-            onChangeText={this.onChangeText}
-            value={this.state.name}
-            nameState="name"
+      <SafeAreaView style={styles.conatiner}>
+        <View style={styles.header}>
+          <Image
+            style={styles.img}
+            source={{
+              uri: this.state.imageurl,
+            }}
           />
+        </View>
 
-          <InputData
-            label="age"
-            placeholder="Age Here"
-            keyboardType="number-pad"
-            onChangeText={this.onChangeText}
-            value={this.state.age}
-            nameState="age"
-          />
+        <View style={styles.pages}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled">
+            <InputData
+              label="Food"
+              placeholder="Food Name Here"
+              onChangeText={this.onChangeText}
+              value={this.state.name}
+              nameState="name"
+            />
 
-          <InputData
-            label="address"
-            placeholder="Address here"
-            onChangeText={this.onChangeText}
-            value={this.state.address}
-            nameState="address"
-          />
-          <Text>Category</Text>
-          <Picker
-            defaultValue="Choose Category"
-            onValueChange={(itemValue, itemIndex) =>
-              this.setState({categoryValue: itemValue})
-            }>
-            {this.state.dataSource.map((item, index) => {
-              return (
+            <InputData
+              label="Rs:"
+              placeholder="Unit Price Here"
+              keyboardType="number-pad"
+              onChangeText={this.onChangeText}
+              value={this.state.unitPrice}
+              nameState="unitPrice"
+            />
+
+            <InputData
+              label="Description"
+              placeholder="Description here"
+              onChangeText={this.onChangeText}
+              value={this.state.description}
+              nameState="description"
+            />
+            <Text style={{color: 'white', marginBottom: 5}}>Category</Text>
+            <View style={styles.card}>
+              <Picker
+                style={{color: 'white'}}
+                onValueChange={(itemValue, itemIndex) =>
+                  this.setState({categoryValue: itemValue})
+                }>
                 <Picker.Item
-                  label={item.categoryName}
-                  value={item.categoryName}
-                  key={index}
+                  label={this.state.categoryValue}
+                  value={this.state.categoryValue}
+                  style={{
+                    color: 'grey',
+                    fontSize: 14,
+                  }}
                 />
-              );
-            })}
-          </Picker>
-
-          <TouchableOpacity
-            style={styles.selectButton}
-            onPress={this.selectImage}>
-            <Text style={styles.buttonText}>Pick an image</Text>
-          </TouchableOpacity>
-          <View style={styles.imgcontainer}>
-            {this.state.imageurl !== null ? (
-              <Image
-                source={{uri: this.state.image.uri}}
-                style={styles.imageBox}
-              />
-            ) : null}
-          </View>
-          {/*           
+                {this.state.dataSource.map((item, index) => {
+                  return (
+                    <Picker.Item
+                      label={item.categoryName}
+                      value={item.categoryName}
+                      key={index}
+                    />
+                  );
+                })}
+              </Picker>
+            </View>
+            <TouchableOpacity
+              style={styles.selectButton}
+              onPress={this.selectImage}>
+              <Text style={styles.buttonText}>Pick an image</Text>
+            </TouchableOpacity>
+            <View style={styles.imgcontainer}>
+              {this.state.imageurl !== null ? (
+                <Image
+                  source={{uri: this.state.image.uri}}
+                  style={styles.imageBox}
+                />
+              ) : null}
+            </View>
+            {/*           
           {this.state.image !== null ? (
             <Image
               source={{uri: this.state.image.uri}}
@@ -231,30 +321,67 @@ export default class Edit extends Component {
             />
           )} */}
 
-          {this.state.uploading ? (
-            <View style={styles.progressBarContainer}>
-              <Progress.Bar progress={this.state.transferred} width={300} />
-            </View>
-          ) : (
-            <TouchableOpacity
-              style={styles.uploadButton}
-              onPress={this.uploadImage}>
-              <Text style={styles.buttonText}>Upload Menu</Text>
-            </TouchableOpacity>
-          )}
-        </ScrollView>
-      </View>
+            {this.state.uploading ? (
+              <View style={styles.progressBarContainer}>
+                <Progress.Bar progress={this.state.transferred} width={300} />
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={styles.uploadButton}
+                onPress={this.uploadImage}>
+                <Text style={styles.buttonText}>Update Menu</Text>
+              </TouchableOpacity>
+            )}
+          </ScrollView>
+        </View>
+        <WarningMessage
+          title="Sorry!"
+          message="Please input suitable field"
+          // confirmText="Yes, Delete"
+          hideAlert={this.hideAlert}
+          showAlert={showAlert}
+          // confirmAlert={this.hideAlert}
+        />
+
+        {/* SUCCESS MESSAGE ALERT */}
+        <WarningMessage
+          title="Successfull!"
+          message="Your Menu Updated"
+          // confirmText="Yes, Delete"
+          hideAlert={this.hideAlertSuccessMsg}
+          showAlert={successAlertMsg}
+          // confirmAlert={this.hideAlert}
+        />
+      </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
+  conatiner: {flex: 1, backgroundColor: 'white'},
+  header: {
+    height: 200,
+  },
+  pages: {
     flex: 1,
     padding: 30,
+    backgroundColor: 'rgba(4, 6, 31, 0.75)',
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    marginHorizontal: 15,
+  },
+  img: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').width,
+  },
+  card: {
+    borderWidth: 1,
+    borderColor: 'white',
+    color: 'black',
+    borderRadius: 5,
   },
   selectButton: {
-    backgroundColor: 'grey',
+    backgroundColor: '#15227A',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
@@ -263,7 +390,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   uploadButton: {
-    backgroundColor: 'black',
+    backgroundColor: COLORS.primary,
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
@@ -273,8 +400,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 14,
   },
 
   progressBarContainer: {
@@ -293,4 +419,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#D0D0D0',
   },
 });
-

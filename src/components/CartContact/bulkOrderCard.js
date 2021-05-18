@@ -1,19 +1,36 @@
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faEdit, faTimes} from '@fortawesome/free-solid-svg-icons';
+import {
+  faAngleDoubleLeft,
+  faArrowLeft,
+  faBug,
+  faClosedCaptioning,
+  faCross,
+  faDice,
+  faEdit,
+  faHandPaper,
+  faKissWinkHeart,
+  faTimes,
+  faUserCircle,
+} from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Switch,
+  Image,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const BulkOrderCard = ({id, bulkItem, navigation}) => {
+const BulkOrderCard = ({id, bulkItem, navigation, removeData}) => {
   return (
     <TouchableOpacity
     // onPress={() => {
     //   navigation.navigate('Details', {id: id});
     // }}
     >
-      <LinearGradient
-        colors={['#63a4ff', '#045de9']}
-        style={styles.linearGradient}>
+      <LinearGradient colors={['grey', 'black']} style={styles.linearGradient}>
         <View>
           <Text style={styles.CardTitleText}>{bulkItem.OrderedFood}</Text>
           <Text style={styles.CardText}>
@@ -33,24 +50,31 @@ const BulkOrderCard = ({id, bulkItem, navigation}) => {
           </Text>
         </View>
 
-        {/* <View style={styles.icon}>
-          <FontAwesomeIcon
+        <View style={styles.icon}>
+          {/* <FontAwesomeIcon
             icon={faEdit}
             color={'white'}
             size={25}
             onPress={() => {
               navigation.navigate('Edit', {id: id});
             }}
-          />
-          <FontAwesomeIcon
-            icon={faTimes}
-            color={'white'}
-            size={25}
-            onPress={() => {
-              removeData(id);
-            }}
-          />
-        </View> */}
+          /> */}
+          {/* <Switch
+            onValueChange={this.BulOrderToggleSwitch}
+            value={this.state.BulkOrderToggled}
+          /> */}
+
+          <TouchableOpacity style={styles.closeIcon}>
+            <FontAwesomeIcon
+              icon={faTimes}
+              color={'white'}
+              size={40}
+              onPress={() => {
+                removeData(id);
+              }}
+            />
+          </TouchableOpacity>
+        </View>
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -91,5 +115,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
+  },
+  closeIcon: {
+    backgroundColor: 'red',
+    borderRadius: 50,
+    padding: 5,
   },
 });

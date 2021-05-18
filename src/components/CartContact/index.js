@@ -11,13 +11,13 @@ const CardContact = ({id, contactItem, navigation, removeData}) => {
         navigation.navigate('Details', {id: id});
       }}>
       <LinearGradient
-        colors={['#63a4ff', '#045de9']}
+        colors={['rgba(4, 6, 31, 0.8)', '#899DB0']}
         style={styles.linearGradient}>
         <View>
           <Text style={styles.name}>{contactItem.name}</Text>
-          <Text style={styles.age}>{contactItem.age}</Text>
-          <Text style={styles.address}>{contactItem.address}</Text>
-          <Text style={styles.address}>{contactItem.category}</Text>
+          <Text style={styles.unitPrice}>{contactItem.unitPrice}</Text>
+          <Text style={styles.description}>{contactItem.description}</Text>
+          <Text style={styles.description}>{contactItem.category}</Text>
         </View>
         <View>
           <Image
@@ -60,7 +60,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     shadowColor: '#000',
-    elevation: 5,
+    
+
+    // elevation: 5,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -70,12 +72,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3.85,
   },
   name: {fontWeight: 'bold', color: 'white', fontSize: 16, width: 100},
-  age: {
+  unitPrice: {
     fontSize: 12,
     color: 'white',
     
   },
-  address: {
+  description: {
     fontSize: 12,
     color: 'white',
   },

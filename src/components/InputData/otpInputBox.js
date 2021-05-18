@@ -18,6 +18,7 @@ const OtpInputData = ({
         keyboardType={keyboardType}
         onChangeText={text => onChangeText(nameState, text)}
         value={value}
+        maxLength={6}
       />
     </>
   );
@@ -29,11 +30,11 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: '#D3D3D3',
     color: 'black',
-    borderRadius: 5,
+    borderRadius: 50,
     marginBottom: 10,
-    fontSize: 25,
+    fontSize: 14,
     textAlign: 'center',
-    letterSpacing: 20,
+    letterSpacing: 25,
     fontWeight:'bold'
   },
 });

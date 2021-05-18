@@ -3,6 +3,7 @@ import {faEdit, faTimes} from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import COLORS from '../../components/colors/color';
 
 const SeatReservationCard = ({id, seatReservation, reserved}) => {
   return (
@@ -12,7 +13,7 @@ const SeatReservationCard = ({id, seatReservation, reserved}) => {
     // }}
     >
       <LinearGradient
-        colors={['#63a4ff', '#045de9']}
+        colors={[COLORS.primary, COLORS.primary]}
         style={styles.linearGradient}>
         <View>
           <Text style={styles.CardTitleText}>OTP - {seatReservation.otp}</Text>
@@ -53,7 +54,7 @@ const SeatReservationCard = ({id, seatReservation, reserved}) => {
         </View>
       </LinearGradient>
       <TouchableOpacity style={styles.touch} onPress={() => reserved(id)}>
-        <Text style={styles.submit}>DONE</Text>
+        <Text style={styles.submit}>GIVEN</Text>
       </TouchableOpacity>
     </View>
   );
@@ -68,47 +69,29 @@ const styles = StyleSheet.create({
     padding: 15,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
-    marginBottom: 1,
-    shadowColor: '#000',
-    elevation: 5,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.85,
   },
 
   CardTitleText: {
     fontWeight: 'bold',
     color: 'white',
-    fontSize: 27,
-    textAlign: 'center',
+    fontSize: 14,
+    textAlign: 'right',
   },
 
   CardText: {
-    fontSize: 17,
+    fontSize: 14,
     color: 'white',
-    marginTop: 10,
-  },
-
-  icon: {
-    flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
   },
 
   touch: {
-    backgroundColor: 'green',
+    backgroundColor: COLORS.secondary,
     padding: 10,
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
   },
   submit: {
     color: 'white',
-    fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 14,
   },
 });

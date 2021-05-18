@@ -7,9 +7,7 @@ import LinearGradient from 'react-native-linear-gradient';
 const CategoryCard = ({id, categoryItem, navigation, removeData}) => {
   return (
     <View style={styles.conatiner}>
-      <LinearGradient
-        colors={['#045de9', '#045de9']}
-        style={styles.linearGradient}>
+      <View style={styles.linearGradient}>
         {/* onPress=
       {() => {
         navigation.navigate('fire', {id: id});
@@ -35,7 +33,7 @@ const CategoryCard = ({id, categoryItem, navigation, removeData}) => {
             }}
           />
         </View>
-      </LinearGradient>
+      </View>
     </View>
   );
 };
@@ -47,10 +45,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     padding: 15,
-    borderRadius: 15,
+    borderRadius: 9,
     marginBottom: 15,
     shadowColor: '#000',
-    elevation: 5,
+    backgroundColor: 'rgba(4, 6, 31, 0.75)',
+    // elevation: 5,
     shadowOffset: {
       width: 0,
       height: 2,

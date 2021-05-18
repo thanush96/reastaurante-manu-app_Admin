@@ -6,6 +6,7 @@ import categoryAdd from './Add/categoryAdd';
 import categoryHome from './Home/CategoryHome';
 import categoryEdit from './EditContact/categoryEdit';
 import BulkOrderHome from './Home/ShowBulkOrders';
+import Orders from './ContactDetails/Orders';
 import SeatReservationHome from './Home/SeatReservationHome';
 
 export {
@@ -18,4 +19,5 @@ export {
   categoryEdit,
   BulkOrderHome,
   SeatReservationHome,
+  Orders,
 };

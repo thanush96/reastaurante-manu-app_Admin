@@ -9,20 +9,10 @@ import {
   RefreshControl,
   Button,
 } from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {
-  faPlus,
-  faShower,
-  faStreetView,
-  faThList,
-} from '@fortawesome/free-solid-svg-icons';
 import FIREBASE from '../../config/FIREBASE';
-import BulkOrderCard from '../../components/CartContact/bulkOrderCard';
-import {Value} from 'react-native-reanimated';
-import CustomAlert from '../../components/Alert/deleteAlert';
-import COLORS from '../../components/colors/color';
+import OrderCard from '../../components/CartContact/OrderCard';
 
-export default class BulkOrderHome extends Component {
+export default class Orders extends Component {
   constructor(props) {
     super(props);
 
@@ -83,41 +73,6 @@ export default class BulkOrderHome extends Component {
     //   });
   }
 
-  // ALERT FUNCTIONS
-  showAlert = id => {
-    this.setState({
-      showAlert: true,
-      getId: id,
-    });
-  };
-
-  confirmAlert = () => {
-    let acceptOrder = FIREBASE.database().ref('BulkOrders/' + this.state.getId);
-    let token = {
-      status: false,
-    };
-    acceptOrder
-      .update(token)
-      .then(data => {
-        console.log('Updated');
-        this.MountData();
-      })
-      .catch(error => {
-        console.log(error);
-      });
-
-    this.setState({
-      showAlert: false,
-    });
-  };
-
-  hideAlert = () => {
-    console.log('hide');
-    this.setState({
-      showAlert: false,
-    });
-  };
-
   // REFRESH FUNCTION
   _onRefresh = () => {
     this.setState({refreshing: true});
@@ -139,40 +94,20 @@ export default class BulkOrderHome extends Component {
           }>
           <View style={styles.listContact}>
             {ordersKey.length > 0 ? (
-              ordersKey.map(key =>
-                orders[key].status == true ? (
-                  <BulkOrderCard
-                    key={key}
-                    bulkItem={orders[key]}
-                    id={key}
-                    {...this.props}
-                    removeData={this.showAlert}
-                  />
-                ) : null,
-              )
+              ordersKey.map(key => (
+                <OrderCard
+                  key={key}
+                  bulkItem={orders[key]}
+                  id={key}
+                  {...this.props}
+                  //   removeData={this.showAlert}
+                />
+              ))
             ) : (
               <Text>No Orders</Text>
             )}
           </View>
         </ScrollView>
-
-        <View style={styles.wrapperButton}>
-          <TouchableOpacity
-            style={styles.btn}
-            onPress={() => this.props.navigation.navigate('Orders')}>
-            <FontAwesomeIcon icon={faThList} size={20} />
-          </TouchableOpacity>
-        </View>
-
-        <CustomAlert
-          title="Conformation!"
-          message="This order completed"
-          confirmText="Yes,"
-          {...this.props}
-          hideAlert={this.hideAlert}
-          showAlert={showAlert}
-          confirmAlert={this.confirmAlert}
-        />
       </View>
     );
   }
@@ -186,7 +121,6 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 30,
     paddingTop: 30,
-    
   },
 
   title: {
@@ -213,7 +147,7 @@ const styles = StyleSheet.create({
 
   btn: {
     padding: 20,
-    backgroundColor: COLORS.secondary,
+    backgroundColor: '#3399ff',
     borderRadius: 30,
     shadowColor: '#000',
     shadowOffset: {

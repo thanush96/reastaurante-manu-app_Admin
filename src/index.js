@@ -25,16 +25,18 @@ const BottomNavigator = () => {
           height: 50,
           borderTopWidth: 0,
           elevation: 0,
-          backgroundColor: '#3399ff',
+          backgroundColor: '#04061F',
         },
         showLabel: true,
-        activeTintColor: '#003300',
+        activeTintColor: '#15227A',
       }}>
       <Tab.Screen
         name="Home"
         component={menuRouter}
         options={{
-          tabBarIcon: ({color}) => <FontAwesomeIcon icon={faHome} size={20} />,
+          tabBarIcon: ({color}) => (
+            <FontAwesomeIcon icon={faHome} color={color} size={25} />
+          ),
         }}
       />
 
@@ -42,7 +44,9 @@ const BottomNavigator = () => {
         name="category"
         component={categoryRouter}
         options={{
-          tabBarIcon: ({color}) => <FontAwesomeIcon icon={faList} size={20} />,
+          tabBarIcon: ({color}) => (
+            <FontAwesomeIcon icon={faList} color={color} size={25} />
+          ),
         }}
       />
 
@@ -51,7 +55,7 @@ const BottomNavigator = () => {
         component={BulkOrdersRouter}
         options={{
           tabBarIcon: ({color}) => (
-            <FontAwesomeIcon icon={faBookmark} size={20} />
+            <FontAwesomeIcon icon={faBookmark} color={color} size={25} />
           ),
         }}
       />
@@ -61,7 +65,7 @@ const BottomNavigator = () => {
         component={SeatReservation}
         options={{
           tabBarIcon: ({color}) => (
-            <FontAwesomeIcon icon={faUserLock} size={20} />
+            <FontAwesomeIcon icon={faUserLock} color={color} size={25} />
           ),
         }}
       />
