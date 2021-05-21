@@ -222,12 +222,10 @@ export default class Edit extends Component {
       successAlertMsg: false,
     });
     this.props.navigation.navigate('Menus');
-
   };
 
   render() {
     const {showAlert, successAlertMsg} = this.state;
-
     return (
       <SafeAreaView style={styles.conatiner}>
         <View style={styles.header}>
@@ -298,28 +296,17 @@ export default class Edit extends Component {
               onPress={this.selectImage}>
               <Text style={styles.buttonText}>Pick an image</Text>
             </TouchableOpacity>
-            <View style={styles.imgcontainer}>
-              {this.state.imageurl !== null ? (
-                <Image
-                  source={{uri: this.state.image.uri}}
-                  style={styles.imageBox}
-                />
-              ) : null}
-            </View>
-            {/*           
-          {this.state.image !== null ? (
-            <Image
-              source={{uri: this.state.image.uri}}
-              style={styles.imageBox}
-            />
-          ) : (
-            <Image
-              style={styles.imageBox}
-              source={{
-                uri: this.state.imageurl,
-              }}
-            />
-          )} */}
+
+            {this.state.imageChoosed ? (
+              <View style={styles.imgcontainer}>
+                {this.state.imageurl !== null ? (
+                  <Image
+                    source={{uri: this.state.image.uri}}
+                    style={styles.imageBox}
+                  />
+                ) : null}
+              </View>
+            ) : null}
 
             {this.state.uploading ? (
               <View style={styles.progressBarContainer}>
@@ -384,7 +371,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#15227A',
     padding: 10,
     borderRadius: 5,
-    marginTop: 10,
+    marginTop: 20,
     marginBottom: 10,
     alignItems: 'center',
     justifyContent: 'center',

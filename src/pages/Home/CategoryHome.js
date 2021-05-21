@@ -29,11 +29,17 @@ export default class CategoryHome extends Component {
   }
 
   componentDidMount() {
-    this.MountData();
-    console.log('Catrgory Mounting....');
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.MountData();
+    });
+  }
+
+  componentWillUnmount() {
+    this._unsubscribe();
   }
 
   MountData() {
+    console.log('refreshing');
     FIREBASE.database()
       .ref('categories')
       .once('value', querySnapShot => {
@@ -47,35 +53,6 @@ export default class CategoryHome extends Component {
         });
       });
   }
-
-  // removeData = id => {
-  //   Alert.alert(
-  //     'Alert Title',
-  //     'My Alert Msg',
-  //     [
-  //       {
-  //         text: 'Cancel',
-  //         onPress: () => console.log('Cancel Pressed'),
-  //         style: 'cancel',
-  //       },
-  //       {
-  //         text: 'ok',
-  //         onPress: () => {
-  //           FIREBASE.database()
-  //             .ref('categories/' + id)
-  //             .remove();
-  //           this.MountData();
-
-  //           Alert.alert('Succes', 'Deleted');
-  //         },
-  //         style: 'cancel',
-  //       },
-  //     ],
-  //     {
-  //       cancelable: false,
-  //     },
-  //   );
-  // };
 
   // ALERT FUNCTIONS
   showAlert = id => {
@@ -106,11 +83,12 @@ export default class CategoryHome extends Component {
   // REFRESH FUNCTION
   _onRefresh = () => {
     this.setState({refreshing: true});
-    this.componentDidMount();
+    // this.componentDidMount();
+    this.MountData();
   };
 
   render() {
-    const {category, categoryKey,showAlert} = this.state;
+    const {category, categoryKey, showAlert} = this.state;
     return (
       <View style={styles.page}>
         <ScrollView

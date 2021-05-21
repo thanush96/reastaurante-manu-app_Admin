@@ -4,12 +4,8 @@ import {
   TouchableOpacity,
   View,
   StyleSheet,
-  Alert,
   ScrollView,
-  Button,
 } from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faPlus} from '@fortawesome/free-solid-svg-icons';
 import FIREBASE from '../../config/FIREBASE';
 import SeatReservationCard from '../../components/CartContact/SeatReservationCard';
 import OtpInputData from '../../components/InputData/otpInputBox';
@@ -30,8 +26,15 @@ export default class BulkOrderHome extends Component {
     };
   }
 
+
   componentDidMount() {
-    this.MountData();
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.MountData();
+    });
+  }
+
+  componentWillUnmount() {
+    this._unsubscribe();
   }
 
   MountData() {
@@ -105,7 +108,6 @@ export default class BulkOrderHome extends Component {
 
   render() {
     const {reservations, reservationKey, showAlert} = this.state;
-
     return (
       <View keyboardShouldPersistTaps="handled">
         <View style={styles.otpInputBox}>

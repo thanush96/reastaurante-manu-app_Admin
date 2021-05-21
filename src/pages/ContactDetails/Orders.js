@@ -26,8 +26,13 @@ export default class Orders extends Component {
   }
 
   componentDidMount() {
-    this.MountData();
-    console.log('BulkOrders Mounting....');
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.MountData();
+    });
+  }
+
+  componentWillUnmount() {
+    this._unsubscribe();
   }
 
   MountData() {
@@ -76,7 +81,7 @@ export default class Orders extends Component {
   // REFRESH FUNCTION
   _onRefresh = () => {
     this.setState({refreshing: true});
-    this.componentDidMount();
+    this.MountData();
   };
 
   render() {

@@ -23,7 +23,29 @@ export default class Add extends Component {
       categoryName: '',
       showAlert: false,
       successAlertMsg: false,
+      DupAlerMsg: false,
+      categories: [],
     };
+  }
+
+  async get_firebase_list() {
+    return FIREBASE.database()
+      .ref('categories')
+      .once('value')
+      .then(function (snapshot) {
+        var items = [];
+        snapshot.forEach(function (childSnapshot) {
+          var childKey = childSnapshot.key;
+          var childData = childSnapshot.val();
+          items.push(childData);
+        });
+        return items;
+      });
+  }
+  async componentWillMount() {
+    this.setState({
+      categories: await this.get_firebase_list(),
+    });
   }
 
   onChangeText = (nameState, value) => {
@@ -33,12 +55,26 @@ export default class Add extends Component {
   };
 
   onSubmit = () => {
+    let duplicate = false;
     if (this.state.categoryName) {
+      this.state.categories.map((item, index) => {
+        if (item.categoryName === this.state.categoryName) {
+          duplicate = true;
+          // console.log(duplicate);
+        }
+      });
+      // console.log(duplicate);
+    } else {
+      this.showAlert();
+      // duplicate = false;
+    }
+
+    if (!duplicate) {
+      // console.log('this is a valide input');
       const addCategory = FIREBASE.database().ref('categories');
       const category = {
         categoryName: this.state.categoryName,
       };
-
       addCategory
         .push(category)
         .then(data => {
@@ -53,11 +89,10 @@ export default class Add extends Component {
           console.log('Error :', error);
         });
 
-      console.log('Added');
-      // console.log(this.state);
+      // console.log('Added');
     } else {
-      this.showAlert();
-      // Alert.alert('Error', 'Please Input here');
+      // console.log('this is duplicated value');
+      this.showDupAlerMsg();
     }
   };
 
@@ -71,6 +106,19 @@ export default class Add extends Component {
   hideAlert = () => {
     this.setState({
       showAlert: false,
+    });
+  };
+
+  // SUCCESSFULL ALERT FUNCTIONS
+  showDupAlerMsg = () => {
+    this.setState({
+      DupAlerMsg: true,
+    });
+  };
+
+  hideDupAlerMsg = () => {
+    this.setState({
+      DupAlerMsg: false,
     });
   };
 
@@ -89,8 +137,7 @@ export default class Add extends Component {
   };
 
   render() {
-    const {showAlert, successAlertMsg} = this.state;
-
+    const {DupAlerMsg, showAlert, successAlertMsg} = this.state;
     return (
       <SafeAreaView style={styles.conatiner}>
         <View style={styles.header}>
@@ -120,7 +167,7 @@ export default class Add extends Component {
         </View>
         <WarningMessage
           title="Sorry!"
-          message="Please input suitable field"
+          message="Please input field"
           // confirmText="Yes, Delete"
           hideAlert={this.hideAlert}
           showAlert={showAlert}
@@ -130,10 +177,19 @@ export default class Add extends Component {
         {/* SUCCESS MESSAGE ALERT */}
         <WarningMessage
           title="Successfull!"
-          message="Your New Menu Uploaded"
+          message="Your New Category Uploaded"
           // confirmText="Yes, Delete"
           hideAlert={this.hideAlertSuccessMsg}
           showAlert={successAlertMsg}
+          // confirmAlert={this.hideAlert}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="This Category Name Alreadt Existed"
+          // confirmText="Yes, Delete"
+          hideAlert={this.hideDupAlerMsg}
+          showAlert={DupAlerMsg}
           // confirmAlert={this.hideAlert}
         />
       </SafeAreaView>

@@ -36,13 +36,17 @@ export default class BulkOrderHome extends Component {
   }
 
   componentDidMount() {
-    this.MountData();
-    console.log('BulkOrders Mounting....');
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.MountData();
+    });
+  }
+
+  componentWillUnmount() {
+    this._unsubscribe();
   }
 
   MountData() {
-    console.log('Mounting....');
-
+    // console.log('Mounting....');
     FIREBASE.database()
       .ref('BulkOrders')
       // .orderByChild('OrderedFood')
@@ -121,7 +125,7 @@ export default class BulkOrderHome extends Component {
   // REFRESH FUNCTION
   _onRefresh = () => {
     this.setState({refreshing: true});
-    this.componentDidMount();
+    this.MountData();
   };
 
   render() {

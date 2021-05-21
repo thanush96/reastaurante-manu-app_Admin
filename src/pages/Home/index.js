@@ -29,8 +29,13 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
-    this.MountData();
-    console.log('Menu Mounting....');
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.MountData();
+    });
+  }
+
+  componentWillUnmount() {
+    this._unsubscribe();
   }
 
   MountData() {
@@ -79,7 +84,7 @@ export default class Home extends Component {
   // REFRESH FUNCTION
   _onRefresh = () => {
     this.setState({refreshing: true});
-    this.componentDidMount();
+    this.MountData();
   };
 
   render() {

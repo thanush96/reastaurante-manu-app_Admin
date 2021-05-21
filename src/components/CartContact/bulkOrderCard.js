@@ -67,8 +67,8 @@ const BulkOrderCard = ({id, bulkItem, navigation, removeData}) => {
           <TouchableOpacity style={styles.closeIcon}>
             <FontAwesomeIcon
               icon={faTimes}
-              color={'white'}
-              size={40}
+              color={'red'}
+              size={30}
               onPress={() => {
                 removeData(id);
               }}
@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closeIcon: {
-    backgroundColor: 'red',
+    backgroundColor: 'white',
     borderRadius: 50,
-    padding: 5,
-  },
+    padding: 1,
+  }
 });

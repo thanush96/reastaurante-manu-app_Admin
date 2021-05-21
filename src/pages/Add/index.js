@@ -252,14 +252,18 @@ export default class Details extends Component {
               onPress={this.selectImage}>
               <Text style={styles.buttonText}>Pick an image</Text>
             </TouchableOpacity>
-            <View style={styles.imgcontainer}>
-              {this.state.image !== null ? (
-                <Image
-                  source={{uri: this.state.image.uri}}
-                  style={styles.imageBox}
-                />
-              ) : null}
-            </View>
+
+            {this.state.imageChoosed ? (
+              <View style={styles.imgcontainer}>
+                {this.state.imageurl !== null ? (
+                  <Image
+                    source={{uri: this.state.image.uri}}
+                    style={styles.imageBox}
+                  />
+                ) : null}
+              </View>
+            ) : null}
+
             {this.state.uploading ? (
               <View style={styles.progressBarContainer}>
                 <Progress.Bar progress={this.state.transferred} width={300} />
@@ -355,7 +359,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#15227A',
     padding: 10,
     borderRadius: 5,
-    marginTop: 10,
+    marginTop: 20,
     marginBottom: 10,
     alignItems: 'center',
     justifyContent: 'center',
