@@ -10,27 +10,28 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
+import DatePicker from 'react-native-datepicker';
 import {InputData} from '../../components';
 import WarningMessage from '../../components/Alert/warningMessage';
 import COLORS from '../../components/colors/color';
 import FIREBASE from '../../config/FIREBASE';
 
-export default class Add extends Component {
+export default class holiday extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      categoryName: '',
       showAlert: false,
       successAlertMsg: false,
       DupAlerMsg: false,
-      categories: [],
+      oldDates: [],
+      date: '',
     };
   }
 
   async get_firebase_list() {
     return FIREBASE.database()
-      .ref('categories')
+      .ref('holidays')
       .once('value')
       .then(function (snapshot) {
         var items = [];
@@ -44,7 +45,7 @@ export default class Add extends Component {
   }
   async componentWillMount() {
     this.setState({
-      categories: await this.get_firebase_list(),
+      oldDates: await this.get_firebase_list(),
     });
   }
 
@@ -56,43 +57,35 @@ export default class Add extends Component {
 
   onSubmit = () => {
     let duplicate = false;
-    if (this.state.categoryName) {
-      this.state.categories.map((item, index) => {
-        if (item.categoryName === this.state.categoryName) {
+    if (this.state.date) {
+      this.state.oldDates.map((item, index) => {
+        if (item.holidayDate === this.state.date) {
           duplicate = true;
-          // console.log(duplicate);
         }
       });
-      // console.log(duplicate);
     } else {
       this.showAlert();
-      // duplicate = false;
     }
 
-    if (this.state.categoryName) {
+    if (this.state.date) {
       if (!duplicate) {
-        // console.log('this is a valide input');
-        const addCategory = FIREBASE.database().ref('categories');
-        const category = {
-          categoryName: this.state.categoryName,
+        const addHolidays = FIREBASE.database().ref('holidays');
+        const holidays = {
+          holidayDate: this.state.date,
         };
-        addCategory
-          .push(category)
+        addHolidays
+          .push(holidays)
           .then(data => {
             this.successShowAlert();
-            // Alert.alert('Success', 'category added');
             this.setState({
-              categoryName: '',
+              date: '',
             });
           })
 
           .catch(error => {
             console.log('Error :', error);
           });
-
-        // console.log('Added');
       } else {
-        // console.log('this is duplicated value');
         this.showDupAlerMsg();
       }
     } else {
@@ -113,7 +106,7 @@ export default class Add extends Component {
     });
   };
 
-  // SUCCESSFULL ALERT FUNCTIONS
+  // DUPLICATE ALERT FUNCTIONS
   showDupAlerMsg = () => {
     this.setState({
       DupAlerMsg: true,
@@ -137,16 +130,17 @@ export default class Add extends Component {
     this.setState({
       successAlertMsg: false,
     });
-    this.props.navigation.navigate('Category');
+    this.props.navigation.navigate('OrderQueue');
   };
 
   render() {
     const {DupAlerMsg, showAlert, successAlertMsg} = this.state;
+    var today = new Date();
     return (
       <SafeAreaView style={styles.conatiner}>
         <View style={styles.header}>
           <View style={styles.title}>
-            <Text style={styles.headerText}>Add New Category</Text>
+            <Text style={styles.headerText}>Add Holiday</Text>
           </View>
         </View>
 
@@ -154,14 +148,39 @@ export default class Add extends Component {
           <ScrollView
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled">
-            <InputData
-              label="Category Name"
-              placeholder="Category Name here"
-              onChangeText={this.onChangeText}
-              value={this.state.categoryName}
-              nameState="categoryName"
+            <DatePicker
+              style={styles.datePickerStyle}
+              date={this.state.date}
+              mode="date"
+              placeholder="Select Your Order date"
+              format="DD-MM-YYYY"
+              minDate={today}
+              maxDate="01-01-2051"
+              confirmBtnText="Confirm"
+              cancelBtnText="Cancel"
+              customStyles={{
+                dateIcon: {
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  marginLeft: 10,
+                },
+                dateInput: {
+                  marginLeft: 0,
+                  backgroundColor: 'grey',
+                  borderColor: 'red',
+                  borderWidth: 10,
+                  height: 45,
+                  marginBottom: 10,
+                  borderWidth: 0,
+                },
+              }}
+              onDateChange={date => {
+                this.setState({
+                  date: date,
+                });
+              }}
             />
-
             <TouchableOpacity
               style={styles.touch}
               onPress={() => this.onSubmit()}>
@@ -171,30 +190,23 @@ export default class Add extends Component {
         </View>
         <WarningMessage
           title="Sorry!"
-          message="Please input Category Name"
-          // confirmText="Yes, Delete"
+          message="Please Select Holiday Date"
           hideAlert={this.hideAlert}
           showAlert={showAlert}
-          // confirmAlert={this.hideAlert}
         />
 
-        {/* SUCCESS MESSAGE ALERT */}
         <WarningMessage
           title="Successfull!"
-          message="Your New Category Uploaded"
-          // confirmText="Yes, Delete"
+          message="Your New Holiday Assigned"
           hideAlert={this.hideAlertSuccessMsg}
           showAlert={successAlertMsg}
-          // confirmAlert={this.hideAlert}
         />
 
         <WarningMessage
           title="Sorry!"
-          message="This Category Name Already Existed"
-          // confirmText="Yes, Delete"
+          message="This Holiday Already Assigned"
           hideAlert={this.hideDupAlerMsg}
           showAlert={DupAlerMsg}
-          // confirmAlert={this.hideAlert}
         />
       </SafeAreaView>
     );
@@ -219,7 +231,10 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').width,
     backgroundColor: COLORS.secondary,
   },
-
+  datePickerStyle: {
+    width: 300,
+    marginTop: 10,
+  },
   headerText: {
     fontSize: 30,
     fontWeight: 'bold',

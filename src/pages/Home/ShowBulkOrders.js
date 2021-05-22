@@ -133,6 +133,19 @@ export default class BulkOrderHome extends Component {
     // console.log(this.props.navigation);
     return (
       <View style={styles.page}>
+        <View style={styles.wrapperButton}>
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => this.props.navigation.navigate('Orders')}>
+            <Text style={{fontSize: 12}}>PREVIOUS ORDERS </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => this.props.navigation.navigate('AddHolidays')}>
+            <Text style={{fontSize: 12}}>SHOP LEAVE DATE </Text>
+          </TouchableOpacity>
+        </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -160,14 +173,6 @@ export default class BulkOrderHome extends Component {
           </View>
         </ScrollView>
 
-        <View style={styles.wrapperButton}>
-          <TouchableOpacity
-            style={styles.btn}
-            onPress={() => this.props.navigation.navigate('Orders')}>
-            <FontAwesomeIcon icon={faThList} size={20} />
-          </TouchableOpacity>
-        </View>
-
         <CustomAlert
           title="Conformation!"
           message="This order completed"
@@ -190,7 +195,6 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 30,
     paddingTop: 30,
-    
   },
 
   title: {
@@ -208,17 +212,21 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   wrapperButton: {
-    flex: 1,
-    position: 'absolute',
+    // position: 'absolute',
+    // backgroundColor: 'red',
     bottom: 0,
     right: 0,
-    margin: 30,
+    paddingTop: 10,
+    paddingBottom: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
 
   btn: {
-    padding: 20,
+    padding: 10,
     backgroundColor: COLORS.secondary,
-    borderRadius: 30,
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -227,5 +235,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    // marginRight: 1,
   },
 });
