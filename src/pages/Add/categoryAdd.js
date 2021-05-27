@@ -60,18 +60,12 @@ export default class Add extends Component {
       this.state.categories.map((item, index) => {
         if (item.categoryName === this.state.categoryName) {
           duplicate = true;
-          // console.log(duplicate);
         }
       });
-      // console.log(duplicate);
-    } else {
-      this.showAlert();
-      // duplicate = false;
     }
 
     if (this.state.categoryName) {
       if (!duplicate) {
-        // console.log('this is a valide input');
         const addCategory = FIREBASE.database().ref('categories');
         const category = {
           categoryName: this.state.categoryName,
@@ -80,7 +74,6 @@ export default class Add extends Component {
           .push(category)
           .then(data => {
             this.successShowAlert();
-            // Alert.alert('Success', 'category added');
             this.setState({
               categoryName: '',
             });
@@ -89,10 +82,7 @@ export default class Add extends Component {
           .catch(error => {
             console.log('Error :', error);
           });
-
-        // console.log('Added');
       } else {
-        // console.log('this is duplicated value');
         this.showDupAlerMsg();
       }
     } else {

@@ -19,7 +19,6 @@ import * as Progress from 'react-native-progress';
 import {Picker} from '@react-native-picker/picker';
 import COLORS from '../../components/colors/color';
 import WarningMessage from '../../components/Alert/warningMessage';
-// import {LogBox} from 'react-native';
 
 export default class Edit extends Component {
   constructor(props) {
@@ -38,6 +37,14 @@ export default class Edit extends Component {
       dataSource: [],
       showAlert: false,
       successAlertMsg: false,
+      nameVal: false,
+      priceVal: false,
+      descriptionVal: false,
+      categoryVal: false,
+      priceNumVal: false,
+      dublicateAtert: false,
+      itemNameInLastTime: '',
+      ExistFood: [],
     };
   }
   async get_firebase_list() {
@@ -54,9 +61,26 @@ export default class Edit extends Component {
         return items;
       });
   }
+
+  async get_Exist_Food_Name() {
+    return FIREBASE.database()
+      .ref('contact')
+      .once('value')
+      .then(function (snapshot) {
+        var items = [];
+        snapshot.forEach(function (childSnapshot) {
+          var childKey = childSnapshot.key;
+          var childData = childSnapshot.val();
+          items.push(childData);
+        });
+        return items;
+      });
+  }
+
   async componentWillMount() {
     this.setState({
       dataSource: await this.get_firebase_list(),
+      ExistFood: await this.get_Exist_Food_Name(),
     });
   }
 
@@ -73,8 +97,8 @@ export default class Edit extends Component {
           description: contactItem.description,
           imageurl: contactItem.imgUrl,
           categoryValue: contactItem.category,
+          itemNameInLastTime: contactItem.name,
         });
-        // console.log(this.state.categoryValue);
       });
   }
 
@@ -106,9 +130,6 @@ export default class Edit extends Component {
       .catch(error => {
         console.log('Error :', error);
       });
-
-    // console.log('onSubmit Fuction');
-    // console.log(this.state);
   };
 
   selectImage = () => {
@@ -135,79 +156,140 @@ export default class Edit extends Component {
   };
 
   uploadImage = async () => {
-    console.log(this.state.categoryValue);
     const {uri} = this.state.image;
-    if (this.state.imageChoosed) {
-      if (
-        this.state.name &&
-        this.state.unitPrice &&
-        this.state.description &&
-        this.state.categoryValue &&
-        !isNaN(this.state.unitPrice)
-      ) {
-        console.log('imageChoosed!');
-        const filename = uri.substring(uri.lastIndexOf('/') + 1);
-        const uploadUri =
-          Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
-        this.setState({uploading: true});
-        this.setState({transferred: 0});
-        const task = storage().ref(filename).putFile(uploadUri);
-        // set progress state
-        task.on('state_changed', snapshot => {
-          this.setState({
-            transferred:
-              Math.round(snapshot.bytesTransferred / snapshot.totalBytes) *
-              10000,
-          });
-        });
-        try {
-          await task;
-          const imageRef = storage().ref(filename);
-          const url = await imageRef.getDownloadURL();
-          console.log(url);
-          this.onSubmit(url);
-        } catch (e) {
-          console.error(('error', e));
+    let duplicate = false;
+    if (this.state.name) {
+      this.state.ExistFood.map((item, index) => {
+        if (item.name === this.state.name) {
+          duplicate = true;
         }
-        this.setState({uploading: false, imageChoosed: false});
-        // console.log('menu update with image!');
+      });
+    }
+
+    if (this.state.imageChoosed) {
+      if (this.state.name) {
+        if (this.state.unitPrice) {
+          if (this.state.description) {
+            if (this.state.categoryValue) {
+              if (!isNaN(this.state.unitPrice)) {
+                if (this.state.itemNameInLastTime == this.state.name) {
+                  console.log('Same Food Name');
+                  const filename = uri.substring(uri.lastIndexOf('/') + 1);
+                  const uploadUri =
+                    Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+                  this.setState({uploading: true});
+                  this.setState({transferred: 0});
+                  const task = storage().ref(filename).putFile(uploadUri);
+                  // set progress state
+                  task.on('state_changed', snapshot => {
+                    this.setState({
+                      transferred:
+                        Math.round(
+                          snapshot.bytesTransferred / snapshot.totalBytes,
+                        ) * 10000,
+                    });
+                  });
+                  try {
+                    await task;
+                    const imageRef = storage().ref(filename);
+                    const url = await imageRef.getDownloadURL();
+                    console.log(url);
+                    this.onSubmit(url);
+                  } catch (e) {
+                    console.error(('error', e));
+                  }
+                  this.setState({uploading: false, imageChoosed: false});
+                } else {
+                  console.log('Deferent Food Name');
+                  if (!duplicate) {
+                    const filename = uri.substring(uri.lastIndexOf('/') + 1);
+                    const uploadUri =
+                      Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+                    this.setState({uploading: true});
+                    this.setState({transferred: 0});
+                    const task = storage().ref(filename).putFile(uploadUri);
+                    // set progress state
+                    task.on('state_changed', snapshot => {
+                      this.setState({
+                        transferred:
+                          Math.round(
+                            snapshot.bytesTransferred / snapshot.totalBytes,
+                          ) * 10000,
+                      });
+                    });
+                    try {
+                      await task;
+                      const imageRef = storage().ref(filename);
+                      const url = await imageRef.getDownloadURL();
+                      console.log(url);
+                      this.onSubmit(url);
+                    } catch (e) {
+                      console.error(('error', e));
+                    }
+                    this.setState({uploading: false, imageChoosed: false});
+                  } else {
+                    this.showDublicateAlert();
+                  }
+                }
+              } else {
+                this.showPriceNumValAlert();
+              }
+            } else {
+              this.showCategoryValAlert();
+            }
+          } else {
+            this.showDescriptionValAlert();
+          }
+        } else {
+          this.showPriceValAlert();
+        }
       } else {
-        // CUSTOM VALIDATION WARNING MESSAGE
-        this.showAlert();
-        console.log('Please input feild');
+        this.showNameValAlert();
       }
     } else {
-      // console.log('menu without image');
-      // this.onSubmit(this.state.imageurl);
-      if (
-        this.state.name &&
-        this.state.unitPrice &&
-        this.state.description &&
-        this.state.categoryValue &&
-        !isNaN(this.state.unitPrice)
-      ) {
-        // console.log('menu update');
-        this.onSubmit(this.state.imageurl);
+      if (this.state.name) {
+        if (this.state.unitPrice) {
+          if (this.state.description) {
+            if (this.state.categoryValue) {
+              if (!isNaN(this.state.unitPrice)) {
+                if (this.state.itemNameInLastTime == this.state.name) {
+                  this.onSubmit(this.state.imageurl);
+                } else {
+                  if (!duplicate) {
+                    this.onSubmit(this.state.imageurl);
+                  } else {
+                    this.showDublicateAlert();
+                  }
+                }
+              } else {
+                this.showPriceNumValAlert();
+              }
+            } else {
+              this.showCategoryValAlert();
+            }
+          } else {
+            this.showDescriptionValAlert();
+          }
+        } else {
+          this.showPriceValAlert();
+        }
       } else {
-        // CUSTOM VALIDATION WARNING MESSAGE
-        this.showAlert();
-        console.log('Please input feild');
+        this.showNameValAlert();
       }
+
+      // if (
+      //   this.state.name &&
+      //   this.state.unitPrice &&
+      //   this.state.description &&
+      //   this.state.categoryValue &&
+      //   !isNaN(this.state.unitPrice)
+      // ) {
+      //   this.onSubmit(this.state.imageurl);
+      // } else {
+      //   this.showAlert();
+      //   console.log('Please input feild');
+      // }
     }
-    // this.setState({image: null});
-  };
-
-  // ALERT FUNCTIONS
-  showAlert = () => {
-    this.setState({
-      showAlert: true,
-    });
-  };
-
-  hideAlert = () => {
-    this.setState({
-      showAlert: false,
-    });
   };
 
   // SUCCESSFULL ALERT FUNCTIONS
@@ -224,8 +306,95 @@ export default class Edit extends Component {
     this.props.navigation.navigate('Menus');
   };
 
+  // VALIATION ALERT MESSAGE FUNCTIONS
+  //NAME ALERT FUNCTIONS
+  showNameValAlert = () => {
+    this.setState({
+      nameVal: true,
+    });
+  };
+
+  hideNameValAlert = () => {
+    this.setState({
+      nameVal: false,
+    });
+  };
+
+  //NAME ALERT FUNCTIONS
+  showPriceValAlert = () => {
+    this.setState({
+      priceVal: true,
+    });
+  };
+
+  hidePriceValAlert = () => {
+    this.setState({
+      priceVal: false,
+    });
+  };
+
+  //NAME ALERT FUNCTIONS
+  showDescriptionValAlert = () => {
+    this.setState({
+      descriptionVal: true,
+    });
+  };
+
+  hideDescriptionValAlert = () => {
+    this.setState({
+      descriptionVal: false,
+    });
+  };
+
+  //NAME ALERT FUNCTIONS
+  showCategoryValAlert = () => {
+    this.setState({
+      categoryVal: true,
+    });
+  };
+
+  hideCategoryValAlert = () => {
+    this.setState({
+      categoryVal: false,
+    });
+  };
+
+  //NAME ALERT FUNCTIONS
+  showPriceNumValAlert = () => {
+    this.setState({
+      priceNumVal: true,
+    });
+  };
+
+  hidePriceNumValAlert = () => {
+    this.setState({
+      priceNumVal: false,
+    });
+  };
+
+  //DUBLICATE ALERT FUNCTIONS
+  showDublicateAlert = () => {
+    this.setState({
+      dublicateAtert: true,
+    });
+  };
+
+  hideDublicateAlert = () => {
+    this.setState({
+      dublicateAtert: false,
+    });
+  };
+
   render() {
-    const {showAlert, successAlertMsg} = this.state;
+    const {
+      successAlertMsg,
+      nameVal,
+      priceVal,
+      descriptionVal,
+      categoryVal,
+      priceNumVal,
+      dublicateAtert,
+    } = this.state;
     return (
       <SafeAreaView style={styles.conatiner}>
         <View style={styles.header}>
@@ -321,23 +490,54 @@ export default class Edit extends Component {
             )}
           </ScrollView>
         </View>
-        <WarningMessage
-          title="Sorry!"
-          message="Please input suitable field"
-          // confirmText="Yes, Delete"
-          hideAlert={this.hideAlert}
-          showAlert={showAlert}
-          // confirmAlert={this.hideAlert}
-        />
 
-        {/* SUCCESS MESSAGE ALERT */}
         <WarningMessage
           title="Successfull!"
           message="Your Menu Updated"
-          // confirmText="Yes, Delete"
           hideAlert={this.hideAlertSuccessMsg}
           showAlert={successAlertMsg}
-          // confirmAlert={this.hideAlert}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Input Food Name"
+          hideAlert={this.hideNameValAlert}
+          showAlert={nameVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Input Food Price"
+          hideAlert={this.hidePriceValAlert}
+          showAlert={priceVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Price Should be Number, Plesae Input Number Type Only in Price Field"
+          hideAlert={this.hidePriceNumValAlert}
+          showAlert={priceNumVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Input Description About The Food"
+          hideAlert={this.hideDescriptionValAlert}
+          showAlert={descriptionVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Choose Food Category"
+          hideAlert={this.hideCategoryValAlert}
+          showAlert={categoryVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="This Food Name is Already Exist, Please Change Food Name"
+          hideAlert={this.hideDublicateAlert}
+          showAlert={dublicateAtert}
         />
       </SafeAreaView>
     );

@@ -7,6 +7,7 @@ import {
   Alert,
   ScrollView,
   RefreshControl,
+  Dimensions
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faPlus} from '@fortawesome/free-solid-svg-icons';
@@ -111,7 +112,15 @@ export default class CategoryHome extends Component {
                 />
               ))
             ) : (
-              <Text>No Items</Text>
+              <View
+                style={{
+                  height: Dimensions.get('window').width,
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text>Sorry! No Foods Available</Text>
+              </View>
             )}
           </View>
         </ScrollView>

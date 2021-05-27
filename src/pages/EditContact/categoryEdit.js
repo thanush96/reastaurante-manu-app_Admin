@@ -22,7 +22,30 @@ export default class categoryEdit extends Component {
       Name: '',
       showAlert: false,
       successAlertMsg: false,
+      dublicateAtert: false,
+      categoryNameInLastTime: '',
+      existCategories: [],
     };
+  }
+
+  async get_Exist_Category_Name() {
+    return FIREBASE.database()
+      .ref('categories')
+      .once('value')
+      .then(function (snapshot) {
+        var items = [];
+        snapshot.forEach(function (childSnapshot) {
+          var childKey = childSnapshot.key;
+          var childData = childSnapshot.val();
+          items.push(childData);
+        });
+        return items;
+      });
+  }
+  async componentWillMount() {
+    this.setState({
+      existCategories: await this.get_Exist_Category_Name(),
+    });
   }
 
   componentDidMount() {
@@ -34,6 +57,7 @@ export default class categoryEdit extends Component {
 
         this.setState({
           Name: categoryItem.categoryName,
+          categoryNameInLastTime: categoryItem.categoryName,
         });
       });
   }
@@ -45,27 +69,54 @@ export default class categoryEdit extends Component {
   };
 
   onSubmit = () => {
+    let duplicate = false;
     if (this.state.Name) {
-      const AddCategory = FIREBASE.database().ref(
-        'categories/' + this.props.route.params.id,
-      );
-      const category = {
-        categoryName: this.state.Name,
-      };
+      this.state.existCategories.map((item, index) => {
+        if (item.categoryName === this.state.Name) {
+          duplicate = true;
+        }
+      });
+    }
 
-      AddCategory.update(category)
-        .then(data => {
-          this.successShowAlert();
-        })
+    if (this.state.Name) {
+      if (this.state.categoryNameInLastTime == this.state.Name) {
+        const AddCategory = FIREBASE.database().ref(
+          'categories/' + this.props.route.params.id,
+        );
+        const category = {
+          categoryName: this.state.Name,
+        };
 
-        .catch(error => {
-          console.log('Error :', error);
-        });
+        AddCategory.update(category)
+          .then(data => {
+            this.successShowAlert();
+          })
 
-      console.log('updated');
-      console.log(this.state);
+          .catch(error => {
+            console.log('Error :', error);
+          });
+      } else {
+        if (!duplicate) {
+          const AddCategory = FIREBASE.database().ref(
+            'categories/' + this.props.route.params.id,
+          );
+          const category = {
+            categoryName: this.state.Name,
+          };
+
+          AddCategory.update(category)
+            .then(data => {
+              this.successShowAlert();
+            })
+
+            .catch(error => {
+              console.log('Error :', error);
+            });
+        } else {
+          this.showDublicateAlert();
+        }
+      }
     } else {
-      // Alert.alert('Error', 'Please Input here');
       this.showAlert();
     }
   };
@@ -97,8 +148,21 @@ export default class categoryEdit extends Component {
     this.props.navigation.navigate('Category');
   };
 
+  //DUBLICATE ALERT FUNCTIONS
+  showDublicateAlert = () => {
+    this.setState({
+      dublicateAtert: true,
+    });
+  };
+
+  hideDublicateAlert = () => {
+    this.setState({
+      dublicateAtert: false,
+    });
+  };
+
   render() {
-    const {showAlert, successAlertMsg} = this.state;
+    const {showAlert, successAlertMsg, dublicateAtert} = this.state;
 
     return (
       <SafeAreaView style={styles.conatiner}>
@@ -117,6 +181,7 @@ export default class categoryEdit extends Component {
               onChangeText={this.onChangeText}
               value={this.state.Name}
               nameState="Name"
+              maxLength={1}
             />
 
             <TouchableOpacity
@@ -130,20 +195,22 @@ export default class categoryEdit extends Component {
         <WarningMessage
           title="Sorry!"
           message="Please input suitable field"
-          // confirmText="Yes, Delete"
           hideAlert={this.hideAlert}
           showAlert={showAlert}
-          // confirmAlert={this.hideAlert}
         />
 
-        {/* SUCCESS MESSAGE ALERT */}
         <WarningMessage
           title="Successfull!"
           message="Your New Menu Uploaded"
-          // confirmText="Yes, Delete"
           hideAlert={this.hideAlertSuccessMsg}
           showAlert={successAlertMsg}
-          // confirmAlert={this.hideAlert}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="This Category Name is Already Exist, Please Change Category Name"
+          hideAlert={this.hideDublicateAlert}
+          showAlert={dublicateAtert}
         />
       </SafeAreaView>
     );

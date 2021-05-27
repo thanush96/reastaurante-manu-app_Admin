@@ -62,7 +62,7 @@ export default class Home extends Component {
   };
 
   confirmAlert = () => {
-    console.log('confirmAlert', this.state.getId);
+    // console.log('confirmAlert', this.state.getId);
     // WRITE DELETE FUNCTION
     FIREBASE.database()
       .ref('contact/' + this.state.getId)

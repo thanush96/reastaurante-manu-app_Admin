@@ -34,8 +34,16 @@ export default class Details extends Component {
       transferred: 0,
       categoryValue: '',
       dataSource: [],
+      ExistFood: [],
       showAlert: false,
       successAlertMsg: false,
+      dublicateAtert: false,
+      nameVal: false,
+      priceVal: false,
+      descriptionVal: false,
+      categoryVal: false,
+      imageVal: false,
+      priceNumVal: false,
     };
   }
 
@@ -53,9 +61,25 @@ export default class Details extends Component {
         return items;
       });
   }
+
+  async get_Exist_Food_Name() {
+    return FIREBASE.database()
+      .ref('contact')
+      .once('value')
+      .then(function (snapshot) {
+        var items = [];
+        snapshot.forEach(function (childSnapshot) {
+          var childKey = childSnapshot.key;
+          var childData = childSnapshot.val();
+          items.push(childData);
+        });
+        return items;
+      });
+  }
   async componentWillMount() {
     this.setState({
       dataSource: await this.get_firebase_list(),
+      ExistFood: await this.get_Exist_Food_Name(),
     });
   }
 
@@ -111,47 +135,76 @@ export default class Details extends Component {
   uploadImage = async () => {
     console.log('uploadImage');
     const {uri} = this.state.image;
-    if (
-      this.state.imageChoosed &&
-      this.state.name &&
-      this.state.unitPrice &&
-      this.state.description &&
-      this.state.categoryValue &&
-      !isNaN(this.state.unitPrice)
-    ) {
-      const filename = uri.substring(uri.lastIndexOf('/') + 1);
-      const uploadUri =
-        Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
-      this.setState({uploading: true});
-      this.setState({transferred: 0});
-      const task = storage().ref(filename).putFile(uploadUri);
-      console.log(filename);
 
-      // set progress state
-      task.on('state_changed', snapshot => {
-        this.setState({
-          transferred:
-            Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 10000,
-        });
+    let duplicate = false;
+    if (this.state.name) {
+      this.state.ExistFood.map((item, index) => {
+        if (item.name === this.state.name) {
+          duplicate = true;
+        }
       });
+    }
 
-      try {
-        await task;
-        const imageRef = storage().ref(filename);
-        const url = await imageRef.getDownloadURL();
-        console.log(url);
-        this.onSubmit(url);
-      } catch (e) {
-        // console.log('error')
-        console.error(e);
+    if (this.state.name) {
+      if (this.state.unitPrice) {
+        if (this.state.description) {
+          if (this.state.categoryValue) {
+            if (this.state.imageChoosed) {
+              if (!duplicate) {
+                if (!isNaN(this.state.unitPrice)) {
+                  const filename = uri.substring(uri.lastIndexOf('/') + 1);
+                  const uploadUri =
+                    Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+                  this.setState({uploading: true});
+                  this.setState({transferred: 0});
+                  const task = storage().ref(filename).putFile(uploadUri);
+                  console.log(filename);
+
+                  // set progress state
+                  task.on('state_changed', snapshot => {
+                    this.setState({
+                      transferred:
+                        Math.round(
+                          snapshot.bytesTransferred / snapshot.totalBytes,
+                        ) * 10000,
+                    });
+                  });
+
+                  try {
+                    await task;
+                    const imageRef = storage().ref(filename);
+                    const url = await imageRef.getDownloadURL();
+                    console.log(url);
+                    this.onSubmit(url);
+                  } catch (e) {
+                    // console.log('error')
+                    console.error(e);
+                    console.log('Bigg Error');
+                  }
+                  this.setState({uploading: false, imageChoosed: false});
+                  this.successShowAlert();
+                  console.log('Your menu has been uploaded!');
+                  this.setState({image: null});
+                } else {
+                  this.showPriceNumValAlert();
+                }
+              } else {
+                this.showDublicateAlert();
+              }
+            } else {
+              this.showImageValAlert();
+            }
+          } else {
+            this.showCategoryValAlert();
+          }
+        } else {
+          this.showDescriptionValAlert();
+        }
+      } else {
+        this.showPriceValAlert();
       }
-      this.setState({uploading: false});
-      this.successShowAlert();
-      console.log('Your menu has been uploaded!');
-      this.setState({image: null});
     } else {
-      this.showAlert();
-      console.log('Please fill field');
+      this.showNameValAlert();
     }
   };
 
@@ -165,6 +218,19 @@ export default class Details extends Component {
   hideAlert = () => {
     this.setState({
       showAlert: false,
+    });
+  };
+
+  //DUBLICATE ALERT FUNCTIONS
+  showDublicateAlert = () => {
+    this.setState({
+      dublicateAtert: true,
+    });
+  };
+
+  hideDublicateAlert = () => {
+    this.setState({
+      dublicateAtert: false,
     });
   };
 
@@ -182,14 +248,102 @@ export default class Details extends Component {
     this.props.navigation.navigate('Menus');
   };
 
+  // VALIATION ALERT MESSAGE FUNCTIONS
+  //NAME ALERT FUNCTIONS
+  showNameValAlert = () => {
+    this.setState({
+      nameVal: true,
+    });
+  };
+
+  hideNameValAlert = () => {
+    this.setState({
+      nameVal: false,
+    });
+  };
+
+  //NAME ALERT FUNCTIONS
+  showPriceValAlert = () => {
+    this.setState({
+      priceVal: true,
+    });
+  };
+
+  hidePriceValAlert = () => {
+    this.setState({
+      priceVal: false,
+    });
+  };
+
+  //NAME ALERT FUNCTIONS
+  showDescriptionValAlert = () => {
+    this.setState({
+      descriptionVal: true,
+    });
+  };
+
+  hideDescriptionValAlert = () => {
+    this.setState({
+      descriptionVal: false,
+    });
+  };
+
+  //NAME ALERT FUNCTIONS
+  showCategoryValAlert = () => {
+    this.setState({
+      categoryVal: true,
+    });
+  };
+
+  hideCategoryValAlert = () => {
+    this.setState({
+      categoryVal: false,
+    });
+  };
+
+  //NAME ALERT FUNCTIONS
+  showImageValAlert = () => {
+    this.setState({
+      imageVal: true,
+    });
+  };
+
+  hideImageValAlert = () => {
+    this.setState({
+      imageVal: false,
+    });
+  };
+  //NAME ALERT FUNCTIONS
+  showPriceNumValAlert = () => {
+    this.setState({
+      priceNumVal: true,
+    });
+  };
+
+  hidePriceNumValAlert = () => {
+    this.setState({
+      priceNumVal: false,
+    });
+  };
+
   render() {
-    const {showAlert, successAlertMsg} = this.state;
+    const {
+      showAlert,
+      dublicateAtert,
+      successAlertMsg,
+      nameVal,
+      priceVal,
+      descriptionVal,
+      categoryVal,
+      imageVal,
+      priceNumVal,
+    } = this.state;
 
     return (
       <SafeAreaView style={styles.conatiner}>
         <View style={styles.header}>
           <View style={styles.title}>
-            <Text style={styles.headerText}>New Manu</Text>
+            <Text style={styles.headerText}>New Menu</Text>
           </View>
         </View>
 
@@ -271,11 +425,7 @@ export default class Details extends Component {
             ) : (
               <TouchableOpacity
                 style={styles.uploadButton}
-                onPress={this.uploadImage}
-                // onPress={() => {
-                //   navigation.navigate('Menus');
-                // }}
-              >
+                onPress={this.uploadImage}>
                 <Text style={styles.buttonText}>Add Menu</Text>
               </TouchableOpacity>
             )}
@@ -285,20 +435,71 @@ export default class Details extends Component {
         <WarningMessage
           title="Sorry!"
           message="Please input suitable field"
-          // confirmText="Yes, Delete"
           hideAlert={this.hideAlert}
           showAlert={showAlert}
-          // confirmAlert={this.hideAlert}
         />
 
-        {/* SUCCESS MESSAGE ALERT */}
+        <WarningMessage
+          title="Sorry!"
+          message="This Food Name is Already Exist, Please Change Food Name"
+          hideAlert={this.hideDublicateAlert}
+          showAlert={dublicateAtert}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Input Food Name"
+          hideAlert={this.hideNameValAlert}
+          showAlert={nameVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Input Food Price"
+          hideAlert={this.hidePriceValAlert}
+          showAlert={priceVal}
+        />
+
         <WarningMessage
           title="Successfull!"
           message="Your New Menu Uploaded"
-          // confirmText="Yes, Delete"
           hideAlert={this.hideAlertSuccessMsg}
           showAlert={successAlertMsg}
-          // confirmAlert={this.hideAlert}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Price Should be Number, Plesae Input Number Type Only in Price Field"
+          hideAlert={this.hidePriceNumValAlert}
+          showAlert={priceNumVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="This Food Name is Already Exist, Please Change Food Name"
+          hideAlert={this.hideDublicateAlert}
+          showAlert={dublicateAtert}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Input Description About The Food"
+          hideAlert={this.hideDescriptionValAlert}
+          showAlert={descriptionVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Choose Food Category"
+          hideAlert={this.hideCategoryValAlert}
+          showAlert={categoryVal}
+        />
+
+        <WarningMessage
+          title="Sorry!"
+          message="Please Choose Image"
+          hideAlert={this.hideImageValAlert}
+          showAlert={imageVal}
         />
       </SafeAreaView>
     );
