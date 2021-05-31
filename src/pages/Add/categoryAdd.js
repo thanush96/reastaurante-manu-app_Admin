@@ -134,16 +134,16 @@ export default class Add extends Component {
     const {DupAlerMsg, showAlert, successAlertMsg} = this.state;
     return (
       <SafeAreaView style={styles.conatiner}>
-        <View style={styles.header}>
-          <View style={styles.title}>
-            <Text style={styles.headerText}>Add New Category</Text>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled">
+          <View style={styles.header}>
+            <View style={styles.title}>
+              <Text style={styles.headerText}>Add New Category</Text>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.pages}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled">
+          <View style={styles.pages}>
             <InputData
               label="Category Name"
               placeholder="Category Name here"
@@ -157,34 +157,28 @@ export default class Add extends Component {
               onPress={() => this.onSubmit()}>
               <Text style={styles.submit}>Add</Text>
             </TouchableOpacity>
-          </ScrollView>
-        </View>
+          </View>
+        </ScrollView>
+
         <WarningMessage
           title="Sorry!"
           message="Please input Category Name"
-          // confirmText="Yes, Delete"
           hideAlert={this.hideAlert}
           showAlert={showAlert}
-          // confirmAlert={this.hideAlert}
         />
 
-        {/* SUCCESS MESSAGE ALERT */}
         <WarningMessage
           title="Successfull!"
           message="Your New Category Uploaded"
-          // confirmText="Yes, Delete"
           hideAlert={this.hideAlertSuccessMsg}
           showAlert={successAlertMsg}
-          // confirmAlert={this.hideAlert}
         />
 
         <WarningMessage
           title="Sorry!"
-          message="This Category Name Already Existed"
-          // confirmText="Yes, Delete"
+          message="This Category Name Already Existed, Please Input New Category Name"
           hideAlert={this.hideDupAlerMsg}
           showAlert={DupAlerMsg}
-          // confirmAlert={this.hideAlert}
         />
       </SafeAreaView>
     );
@@ -200,8 +194,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 30,
     backgroundColor: 'rgba(4, 6, 31, 0.75)',
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    borderRadius: 15,
     marginHorizontal: 15,
   },
   title: {

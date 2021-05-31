@@ -25,8 +25,15 @@ const CardContact = ({id, contactItem, navigation, removeData}) => {
           <Text style={styles.name}>{contactItem.name}</Text>
           <Text style={styles.unitPrice}>Rs:{contactItem.unitPrice}</Text>
           <Text style={styles.description}>{contactItem.description}</Text>
-          <Text style={styles.category}>{contactItem.category}</Text>
+          <View>
+            <Text style={styles.category}>{contactItem.category}</Text>
+            <Text style={styles.category}>{contactItem.category2}</Text>
+            <Text style={styles.category}>{contactItem.category4}</Text>
+            <Text style={styles.category}>{contactItem.category4}</Text>
+            <Text style={styles.category}>{contactItem.category5}</Text>
+          </View>
         </View>
+
         <View>
           <Image
             style={styles.img}
@@ -35,25 +42,28 @@ const CardContact = ({id, contactItem, navigation, removeData}) => {
             }}
           />
         </View>
-        <View style={styles.icon}>
-          <FontAwesomeIcon
-            icon={faEdit}
-            color={'white'}
-            size={25}
-            onPress={() => {
-              navigation.navigate('Edit', {id: id});
-            }}
-          />
-          <FontAwesomeIcon
-            icon={faTimes}
-            color={'white'}
-            size={25}
-            onPress={() => {
-              removeData(id);
-            }}
-          />
-        </View>
       </LinearGradient>
+      <View style={styles.icon}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Edit', {id: id});
+          }}>
+          <Text style={styles.editAction}>
+            {/* <FontAwesomeIcon icon={faEdit} color={'white'} size={25} /> */}
+            Edit
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            removeData(id);
+          }}>
+          <Text style={styles.deleteAction}>
+            {/* <FontAwesomeIcon icon={faTimes} color={'white'} size={25} /> */}
+            Delete
+          </Text>
+        </TouchableOpacity>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -65,8 +75,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    marginTop: 15,
     shadowColor: '#000',
     // elevation: 5,
     shadowOffset: {
@@ -75,6 +86,25 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.85,
+  },
+  editAction: {
+    backgroundColor: COLORS.primary,
+    fontSize: 18,
+    width: 120,
+    textAlign: 'center',
+    margin: 5,
+    borderRadius: 8,
+    color: 'white',
+  },
+
+  deleteAction: {
+    backgroundColor: 'red',
+    fontSize: 18,
+    width: 120,
+    textAlign: 'center',
+    margin: 5,
+    borderRadius: 8,
+    color: 'white',
   },
 
   name: {
@@ -89,7 +119,6 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 12,
-    // backgroundColor: 'red',
     color: 'white',
     width: Dimensions.get('window').width / 3,
   },
@@ -99,15 +128,19 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width / 3,
   },
   img: {
-    width: 100,
-    height: 100,
-    borderRadius: 5,
+    width: 150,
+    height: 150,
+    borderRadius: 100,
+    borderColor: 'white',
+    borderWidth: 2,
   },
 
   icon: {
     flexDirection: 'row',
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    // alignItems: 'center',
+    backgroundColor: 'grey',
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
   },
 });

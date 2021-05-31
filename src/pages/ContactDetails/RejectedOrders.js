@@ -10,9 +10,9 @@ import {
   Button,
 } from 'react-native';
 import FIREBASE from '../../config/FIREBASE';
-import OrderCard from '../../components/CartContact/OrderCard';
+import OrderCard from '../../components/CartContact/RejectOrderCard';
 
-export default class Orders extends Component {
+export default class RejectOrder extends Component {
   constructor(props) {
     super(props);
 
@@ -40,6 +40,8 @@ export default class Orders extends Component {
 
     FIREBASE.database()
       .ref('BulkOrders')
+      // .orderByChild('OrderedFood')
+      // .startAt('F')
       .once('value', querySnapShot => {
         let data = querySnapShot.val() ? querySnapShot.val() : {};
         let bulkItem = {...data};
@@ -73,7 +75,7 @@ export default class Orders extends Component {
           <View style={styles.listContact}>
             {ordersKey.length > 0 ? (
               ordersKey.map(key =>
-                orders[key].status == false ? (
+                orders[key].reject == true ? (
                   <OrderCard
                     key={key}
                     bulkItem={orders[key]}

@@ -33,6 +33,11 @@ export default class Details extends Component {
       uploading: false,
       transferred: 0,
       categoryValue: '',
+      categoryValue2: '',
+      categoryValue3: '',
+      categoryValue4: '',
+      categoryValue5: '',
+      cat: [],
       dataSource: [],
       ExistFood: [],
       showAlert: false,
@@ -90,10 +95,40 @@ export default class Details extends Component {
   };
 
   onSubmit = imageUrl => {
-    const AddContact = FIREBASE.database().ref('contact');
+    console.log('onSubmit Function');
+    // var queue = {userName: 'gfdgdfg', userPhone: 54535};
+    // FIREBASE.database()
+    //   .ref('contact/')
+    //   .push({
+    //     queue: queue,
+    //   })
+    //   .then(data => {
+    //     //success callback
+    //     console.log('data ', data);
+    //   })
+    //   .catch(error => {
+    //     //error callback
+    //     console.log('error ', error);
+    // });
+
+    // var newItem = {userName: 'gfdgdfg', userPhone: 54535};
+    // FIREBASE.database()
+    //   .ref('contact')
+    //   .once('value')
+    //   .then(function (snapshot) {
+    //     snapshot.forEach(function (barberSnapshot) {
+    //       barberSnapshot.child('queue').ref.push(newItem);
+    //     });
+    //   });
+
+    const AddContact = FIREBASE.database().ref('contact/');
     const contact = {
       name: this.state.name,
       category: this.state.categoryValue,
+      category2: this.state.categoryValue2,
+      category3: this.state.categoryValue3,
+      category4: this.state.categoryValue4,
+      category5: this.state.categoryValue5,
       unitPrice: this.state.unitPrice,
       description: this.state.description,
       imgUrl: imageUrl,
@@ -341,24 +376,27 @@ export default class Details extends Component {
 
     return (
       <SafeAreaView style={styles.conatiner}>
-        <View style={styles.header}>
-          <View style={styles.title}>
-            <Text style={styles.headerText}>New Menu</Text>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled">
+          <View style={styles.header}>
+            <View style={styles.title}>
+              <Text style={styles.headerText}>New Menu</Text>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.pages}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled">
-            <InputData
-              label="Name"
-              placeholder="Enter the Food Name"
-              onChangeText={this.onChangeText}
+          <View style={styles.pages}>
+            <Text style={styles.label}>Food Name</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Enter Food Name"
+              onChangeText={text => this.setState({name: text})}
               value={this.state.name}
-              nameState="name"
+              placeholderTextColor="grey"
+              maxLength={13}
             />
-            <Text style={styles.label}>Price</Text>
+
+            <Text style={styles.label}>Rs : </Text>
             <TextInput
               style={styles.textInput}
               placeholder="Enter the Unit Price"
@@ -368,18 +406,124 @@ export default class Details extends Component {
               keyboardType="number-pad"
               maxLength={4}
             />
-            <InputData
-              label="Description"
-              placeholder="Description"
-              onChangeText={this.onChangeText}
+            <Text style={styles.label}>Description</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Enter About The Food Description"
+              onChangeText={text => this.setState({description: text})}
               value={this.state.description}
-              nameState="description"
+              placeholderTextColor="grey"
+              maxLength={40}
             />
             <Text style={{color: 'white', marginBottom: 5}}>Category</Text>
             <View style={styles.card}>
               <Picker
                 onValueChange={(itemValue, itemIndex) =>
                   this.setState({categoryValue: itemValue})
+                }
+                style={{color: 'white'}}>
+                <Picker.Item
+                  label="Choose Category"
+                  value=""
+                  style={{
+                    color: 'grey',
+                    fontSize: 14,
+                  }}
+                />
+                {this.state.dataSource.map((item, index) => {
+                  return (
+                    <Picker.Item
+                      label={item.categoryName}
+                      value={item.categoryName}
+                      key={index}
+                    />
+                  );
+                })}
+              </Picker>
+            </View>
+
+            <View style={styles.card}>
+              <Picker
+                onValueChange={(itemValue, itemIndex) =>
+                  this.setState({categoryValue2: itemValue})
+                }
+                style={{color: 'white'}}>
+                <Picker.Item
+                  label="Choose Category"
+                  value=""
+                  style={{
+                    color: 'grey',
+                    fontSize: 14,
+                  }}
+                />
+                {this.state.dataSource.map((item, index) => {
+                  return (
+                    <Picker.Item
+                      label={item.categoryName}
+                      value={item.categoryName}
+                      key={index}
+                    />
+                  );
+                })}
+              </Picker>
+            </View>
+
+            <View style={styles.card}>
+              <Picker
+                onValueChange={(itemValue, itemIndex) =>
+                  this.setState({categoryValue3: itemValue})
+                }
+                style={{color: 'white'}}>
+                <Picker.Item
+                  label="Choose Category"
+                  value=""
+                  style={{
+                    color: 'grey',
+                    fontSize: 14,
+                  }}
+                />
+                {this.state.dataSource.map((item, index) => {
+                  return (
+                    <Picker.Item
+                      label={item.categoryName}
+                      value={item.categoryName}
+                      key={index}
+                    />
+                  );
+                })}
+              </Picker>
+            </View>
+
+            <View style={styles.card}>
+              <Picker
+                onValueChange={(itemValue, itemIndex) =>
+                  this.setState({categoryValue4: itemValue})
+                }
+                style={{color: 'white'}}>
+                <Picker.Item
+                  label="Choose Category"
+                  value=""
+                  style={{
+                    color: 'grey',
+                    fontSize: 14,
+                  }}
+                />
+                {this.state.dataSource.map((item, index) => {
+                  return (
+                    <Picker.Item
+                      label={item.categoryName}
+                      value={item.categoryName}
+                      key={index}
+                    />
+                  );
+                })}
+              </Picker>
+            </View>
+
+            <View style={styles.card}>
+              <Picker
+                onValueChange={(itemValue, itemIndex) =>
+                  this.setState({categoryValue5: itemValue})
                 }
                 style={{color: 'white'}}>
                 <Picker.Item
@@ -420,17 +564,18 @@ export default class Details extends Component {
 
             {this.state.uploading ? (
               <View style={styles.progressBarContainer}>
-                <Progress.Bar progress={this.state.transferred} width={300} />
+                <Progress.Bar progress={this.state.transferred} width={200} />
               </View>
             ) : (
               <TouchableOpacity
                 style={styles.uploadButton}
                 onPress={this.uploadImage}>
+                {/* onPress={this.onSubmit}> */}
                 <Text style={styles.buttonText}>Add Menu</Text>
               </TouchableOpacity>
             )}
-          </ScrollView>
-        </View>
+          </View>
+        </ScrollView>
 
         <WarningMessage
           title="Sorry!"
@@ -515,9 +660,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 30,
     backgroundColor: 'rgba(4, 6, 31, 0.75)',
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    borderRadius: 15,
     marginHorizontal: 15,
+    marginBottom: 5,
   },
   title: {
     fontSize: 30,
@@ -555,6 +700,7 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     color: 'black',
     borderRadius: 5,
+    marginBottom: 5,
   },
   selectButton: {
     backgroundColor: '#15227A',
@@ -581,6 +727,7 @@ const styles = StyleSheet.create({
 
   progressBarContainer: {
     margin: 10,
+    alignItems: 'center',
   },
 
   imgcontainer: {

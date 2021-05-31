@@ -19,7 +19,6 @@ const InputData = ({
         keyboardType={keyboardType}
         onChangeText={text => onChangeText(nameState, text)}
         value={value}
-
       />
     </>
   );

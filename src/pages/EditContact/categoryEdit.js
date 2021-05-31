@@ -166,22 +166,21 @@ export default class categoryEdit extends Component {
 
     return (
       <SafeAreaView style={styles.conatiner}>
-        <View style={styles.header}>
-          <View style={styles.title}>
-            <Text style={styles.headerText}>Edit Category</Text>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled">
+          <View style={styles.header}>
+            <View style={styles.title}>
+              <Text style={styles.headerText}>Edit Category</Text>
+            </View>
           </View>
-        </View>
-        <View style={styles.pages}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled">
+          <View style={styles.pages}>
             <InputData
               label="Category Name"
               placeholder="Category Name here"
               onChangeText={this.onChangeText}
               value={this.state.Name}
               nameState="Name"
-              maxLength={1}
             />
 
             <TouchableOpacity
@@ -189,19 +188,19 @@ export default class categoryEdit extends Component {
               onPress={() => this.onSubmit()}>
               <Text style={styles.submit}>Submit</Text>
             </TouchableOpacity>
-          </ScrollView>
-        </View>
+          </View>
+        </ScrollView>
 
         <WarningMessage
           title="Sorry!"
-          message="Please input suitable field"
+          message="Please input category name"
           hideAlert={this.hideAlert}
           showAlert={showAlert}
         />
 
         <WarningMessage
           title="Successfull!"
-          message="Your New Menu Uploaded"
+          message="Success Your Category Update "
           hideAlert={this.hideAlertSuccessMsg}
           showAlert={successAlertMsg}
         />
@@ -226,8 +225,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 30,
     backgroundColor: 'rgba(4, 6, 31, 0.75)',
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    borderRadius: 15,
     marginHorizontal: 15,
   },
   title: {

@@ -31,6 +31,7 @@ export default class BulkOrderHome extends Component {
       ordersKey: [],
       refreshing: false,
       showAlert: false,
+      showRejectAlert: false,
       getId: '',
     };
   }
@@ -122,14 +123,52 @@ export default class BulkOrderHome extends Component {
     });
   };
 
+  showRejectAlert = id => {
+    this.setState({
+      showRejectAlert: true,
+      getId: id,
+    });
+  };
+
+  confirmshowRejectAlert = () => {
+    let acceptOrder = FIREBASE.database().ref('BulkOrders/' + this.state.getId);
+    let token = {
+      reject: true,
+    };
+    acceptOrder
+      .update(token)
+      .then(data => {
+        console.log('Updated');
+        this.MountData();
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    this.setState({
+      showRejectAlert: false,
+    });
+  };
+
+  hideshowRejectAlert = () => {
+    console.log('hide');
+    this.setState({
+      showRejectAlert: false,
+    });
+  };
+
   // REFRESH FUNCTION
   _onRefresh = () => {
     this.setState({refreshing: true});
     this.MountData();
   };
 
+  aprove = () => {
+    console.log('aprove');
+  };
+
   render() {
-    const {orders, ordersKey, showAlert} = this.state;
+    const {orders, ordersKey, showAlert, showRejectAlert} = this.state;
     // console.log(this.props.navigation);
     return (
       <View style={styles.page}>
@@ -138,6 +177,12 @@ export default class BulkOrderHome extends Component {
             style={styles.btn}
             onPress={() => this.props.navigation.navigate('Orders')}>
             <Text style={{fontSize: 12}}>PREVIOUS ORDERS </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => this.props.navigation.navigate('RejectedOrder')}>
+            <Text style={{fontSize: 12}}>REJECTED </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -158,13 +203,16 @@ export default class BulkOrderHome extends Component {
             {ordersKey.length > 0 ? (
               ordersKey.map(key =>
                 orders[key].status == true ? (
-                  <BulkOrderCard
-                    key={key}
-                    bulkItem={orders[key]}
-                    id={key}
-                    {...this.props}
-                    removeData={this.showAlert}
-                  />
+                  orders[key].reject == false ? (
+                    <BulkOrderCard
+                      key={key}
+                      bulkItem={orders[key]}
+                      id={key}
+                      {...this.props}
+                      removeData={this.showAlert}
+                      aprove={this.showRejectAlert}
+                    />
+                  ) : null
                 ) : null,
               )
             ) : (
@@ -174,13 +222,23 @@ export default class BulkOrderHome extends Component {
         </ScrollView>
 
         <CustomAlert
-          title="Conformation!"
-          message="This order completed"
+          title="Are your sure?"
+          message="Accept this order"
           confirmText="Yes,"
           {...this.props}
           hideAlert={this.hideAlert}
           showAlert={showAlert}
           confirmAlert={this.confirmAlert}
+        />
+
+        <CustomAlert
+          title="Are your sure? "
+          message="Reject this order"
+          confirmText="Yes,"
+          {...this.props}
+          hideAlert={this.hideshowRejectAlert}
+          showAlert={showRejectAlert}
+          confirmAlert={this.confirmshowRejectAlert}
         />
       </View>
     );

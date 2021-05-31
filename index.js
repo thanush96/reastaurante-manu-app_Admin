@@ -5,7 +5,7 @@
 import {AppRegistry} from 'react-native';
 import App from './App';
 // import App from './src/pages/Home/CategoryHome';
-// import App from './src/pages/Home/index';
+// import App from './src/pages/Home/tag';
 
 import {name as appName} from './app.json';
 

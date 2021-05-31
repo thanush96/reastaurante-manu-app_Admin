@@ -25,10 +25,11 @@ export default class Home extends Component {
       showAlert: false,
       getId: '',
       refreshing: false,
+      ExistFood: [],
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       this.MountData();
     });
@@ -62,7 +63,6 @@ export default class Home extends Component {
   };
 
   confirmAlert = () => {
-    // console.log('confirmAlert', this.state.getId);
     // WRITE DELETE FUNCTION
     FIREBASE.database()
       .ref('contact/' + this.state.getId)

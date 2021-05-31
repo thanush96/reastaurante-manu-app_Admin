@@ -23,7 +23,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const BulkOrderCard = ({id, bulkItem, navigation, removeData}) => {
+const BulkOrderCard = ({id, bulkItem, navigation, aprove, removeData}) => {
   return (
     <TouchableOpacity
     // onPress={() => {
@@ -51,18 +51,16 @@ const BulkOrderCard = ({id, bulkItem, navigation, removeData}) => {
         </View>
 
         <View style={styles.icon}>
-          {/* <FontAwesomeIcon
-            icon={faEdit}
-            color={'white'}
-            size={25}
-            onPress={() => {
-              navigation.navigate('Edit', {id: id});
-            }}
-          /> */}
-          {/* <Switch
-            onValueChange={this.BulOrderToggleSwitch}
-            value={this.state.BulkOrderToggled}
-          /> */}
+          <TouchableOpacity style={styles.closeIcon}>
+            <FontAwesomeIcon
+              icon={faTimes}
+              color={'green'}
+              size={30}
+              onPress={() => {
+                removeData(id);
+              }}
+            />
+          </TouchableOpacity>
 
           <TouchableOpacity style={styles.closeIcon}>
             <FontAwesomeIcon
@@ -70,7 +68,7 @@ const BulkOrderCard = ({id, bulkItem, navigation, removeData}) => {
               color={'red'}
               size={30}
               onPress={() => {
-                removeData(id);
+                aprove(id);
               }}
             />
           </TouchableOpacity>
@@ -120,5 +118,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 50,
     padding: 1,
-  }
+  },
 });
