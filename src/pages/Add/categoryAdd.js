@@ -78,7 +78,6 @@ export default class Add extends Component {
               categoryName: '',
             });
           })
-
           .catch(error => {
             console.log('Error :', error);
           });

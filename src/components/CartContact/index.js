@@ -1,5 +1,3 @@
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faEdit, faTimes} from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import {
   StyleSheet,
@@ -19,18 +17,49 @@ const CardContact = ({id, contactItem, navigation, removeData}) => {
         navigation.navigate('Details', {id: id});
       }}>
       <LinearGradient
-        colors={['rgba(4, 6, 31, 0.8)', '#899DB0']}
+        colors={[COLORS.dark, COLORS.primary]}
         style={styles.linearGradient}>
         <View>
           <Text style={styles.name}>{contactItem.name}</Text>
-          <Text style={styles.unitPrice}>Rs:{contactItem.unitPrice}</Text>
+          <View
+            style={{
+              backgroundColor: 'red',
+              width: Dimensions.get('window').width / 5,
+              color: 'white',
+              borderBottomRightRadius: 10,
+              borderTopRightRadius: 10,
+            }}>
+            <Text style={styles.unitPrice}>Rs:{contactItem.unitPrice}</Text>
+          </View>
+
           <Text style={styles.description}>{contactItem.description}</Text>
+          <View
+            style={{
+              backgroundColor: 'grey',
+              color: 'white',
+              paddingLeft: 5,
+              paddingRight: 5,
+              borderBottomRightRadius: 10,
+              borderTopRightRadius: 10,
+              width: Dimensions.get('window').width / 3.5,
+            }}>
+            <Text
+              style={{
+                color: 'white',
+                textAlign: 'center',
+              }}>
+              Abilable as
+            </Text>
+          </View>
+
           <View>
-            <Text style={styles.category}>{contactItem.category}</Text>
-            <Text style={styles.category}>{contactItem.category2}</Text>
-            <Text style={styles.category}>{contactItem.category4}</Text>
-            <Text style={styles.category}>{contactItem.category4}</Text>
-            <Text style={styles.category}>{contactItem.category5}</Text>
+            {contactItem.category.map((item, key) => {
+              return (
+                <View key={key}>
+                  <Text style={styles.category}>{item}</Text>
+                </View>
+              );
+            })}
           </View>
         </View>
 
@@ -74,7 +103,6 @@ const styles = StyleSheet.create({
   linearGradient: {
     flex: 1,
     flexDirection: 'row',
-    padding: 15,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     marginTop: 15,
@@ -109,25 +137,28 @@ const styles = StyleSheet.create({
 
   name: {
     fontWeight: 'bold',
-    color: 'white',
-    fontSize: 16,
+    color: 'grey',
+    fontSize: 20,
+    margin: 5,
     width: Dimensions.get('window').width / 3,
   },
   unitPrice: {
-    fontSize: 12,
+    fontSize: 20,
     color: 'white',
   },
   description: {
     fontSize: 12,
+    margin: 5,
     color: 'white',
     width: Dimensions.get('window').width / 3,
   },
   category: {
-    fontSize: 14,
-    color: COLORS.primary,
-    width: Dimensions.get('window').width / 3,
+    fontSize: 12,
+    color: COLORS.light,
+    marginLeft: 15,
   },
   img: {
+    margin: 15,
     width: 150,
     height: 150,
     borderRadius: 100,

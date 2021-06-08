@@ -11,6 +11,7 @@ import {
   Image,
   Dimensions,
   TextInput,
+  Button,
 } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
@@ -20,6 +21,7 @@ import {Picker} from '@react-native-picker/picker';
 import FIREBASE from '../../config/FIREBASE';
 import COLORS from '../../components/colors/color';
 import WarningMessage from '../../components/Alert/warningMessage';
+import CheckBox from '@react-native-community/checkbox';
 
 export default class Details extends Component {
   constructor(props) {
@@ -32,11 +34,6 @@ export default class Details extends Component {
       imageChoosed: false,
       uploading: false,
       transferred: 0,
-      categoryValue: '',
-      categoryValue2: '',
-      categoryValue3: '',
-      categoryValue4: '',
-      categoryValue5: '',
       cat: [],
       dataSource: [],
       ExistFood: [],
@@ -57,13 +54,14 @@ export default class Details extends Component {
       .ref('categories')
       .once('value')
       .then(function (snapshot) {
-        var items = [];
-        snapshot.forEach(function (childSnapshot) {
-          var childKey = childSnapshot.key;
-          var childData = childSnapshot.val();
-          items.push(childData);
+        var categortName = [];
+        snapshot.forEach(childSnapshot => {
+          var key = childSnapshot.key;
+          var name = childSnapshot.val();
+          categortName.push(name);
         });
-        return items;
+        // console.log(categortName)
+        return categortName;
       });
   }
 
@@ -88,47 +86,48 @@ export default class Details extends Component {
     });
   }
 
+  onchecked(categoryName) {
+    // console.log(categoryName);
+    const data = this.state.dataSource;
+    const index = data.findIndex(x => x.categoryName === categoryName);
+    // console.log(index);
+    data[index].checked = !data[index].checked;
+    this.setState(data);
+    // console.log(this.state.dataSource);
+  }
+
+  renderItem() {
+    return this.state.dataSource.map((item, key) => {
+      return (
+        <TouchableOpacity
+          style={{flexDirection: 'row'}}
+          key={key}
+          onPress={() => {
+            this.onchecked(item.categoryName);
+          }}>
+          <CheckBox
+            value={item.checked}
+            onValueChange={() => {
+              this.onchecked(item.categoryName);
+            }}
+          />
+          <Text>{item.categoryName}</Text>
+        </TouchableOpacity>
+      );
+    });
+  }
+
   onChangeText = (nameState, value) => {
     this.setState({
       [nameState]: value,
     });
   };
 
-  onSubmit = imageUrl => {
-    console.log('onSubmit Function');
-    // var queue = {userName: 'gfdgdfg', userPhone: 54535};
-    // FIREBASE.database()
-    //   .ref('contact/')
-    //   .push({
-    //     queue: queue,
-    //   })
-    //   .then(data => {
-    //     //success callback
-    //     console.log('data ', data);
-    //   })
-    //   .catch(error => {
-    //     //error callback
-    //     console.log('error ', error);
-    // });
-
-    // var newItem = {userName: 'gfdgdfg', userPhone: 54535};
-    // FIREBASE.database()
-    //   .ref('contact')
-    //   .once('value')
-    //   .then(function (snapshot) {
-    //     snapshot.forEach(function (barberSnapshot) {
-    //       barberSnapshot.child('queue').ref.push(newItem);
-    //     });
-    //   });
-
+  onSubmit = (imageUrl, selectedArray) => {
     const AddContact = FIREBASE.database().ref('contact/');
     const contact = {
       name: this.state.name,
-      category: this.state.categoryValue,
-      category2: this.state.categoryValue2,
-      category3: this.state.categoryValue3,
-      category4: this.state.categoryValue4,
-      category5: this.state.categoryValue5,
+      category: selectedArray,
       unitPrice: this.state.unitPrice,
       description: this.state.description,
       imgUrl: imageUrl,
@@ -180,10 +179,20 @@ export default class Details extends Component {
       });
     }
 
+    console.log('onSubmit Function');
+    var key = this.state.dataSource.map(t => t.categoryName);
+    var checks = this.state.dataSource.map(t => t.checked);
+    let selectedArray = [];
+    for (let i = 0; i < checks.length; i++) {
+      if (checks[i] == true) {
+        selectedArray.push(key[i]);
+      }
+    }
+
     if (this.state.name) {
       if (this.state.unitPrice) {
         if (this.state.description) {
-          if (this.state.categoryValue) {
+          if (selectedArray.length != 0) {
             if (this.state.imageChoosed) {
               if (!duplicate) {
                 if (!isNaN(this.state.unitPrice)) {
@@ -210,7 +219,7 @@ export default class Details extends Component {
                     const imageRef = storage().ref(filename);
                     const url = await imageRef.getDownloadURL();
                     console.log(url);
-                    this.onSubmit(url);
+                    this.onSubmit(url, selectedArray);
                   } catch (e) {
                     // console.log('error')
                     console.error(e);
@@ -231,6 +240,7 @@ export default class Details extends Component {
             }
           } else {
             this.showCategoryValAlert();
+            console.log(selectedArray);
           }
         } else {
           this.showDescriptionValAlert();
@@ -415,136 +425,11 @@ export default class Details extends Component {
               placeholderTextColor="grey"
               maxLength={40}
             />
-            <Text style={{color: 'white', marginBottom: 5}}>Category</Text>
-            <View style={styles.card}>
-              <Picker
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({categoryValue: itemValue})
-                }
-                style={{color: 'white'}}>
-                <Picker.Item
-                  label="Choose Category"
-                  value=""
-                  style={{
-                    color: 'grey',
-                    fontSize: 14,
-                  }}
-                />
-                {this.state.dataSource.map((item, index) => {
-                  return (
-                    <Picker.Item
-                      label={item.categoryName}
-                      value={item.categoryName}
-                      key={index}
-                    />
-                  );
-                })}
-              </Picker>
+
+            <View>
+              <View>{this.renderItem()}</View>
             </View>
 
-            <View style={styles.card}>
-              <Picker
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({categoryValue2: itemValue})
-                }
-                style={{color: 'white'}}>
-                <Picker.Item
-                  label="Choose Category"
-                  value=""
-                  style={{
-                    color: 'grey',
-                    fontSize: 14,
-                  }}
-                />
-                {this.state.dataSource.map((item, index) => {
-                  return (
-                    <Picker.Item
-                      label={item.categoryName}
-                      value={item.categoryName}
-                      key={index}
-                    />
-                  );
-                })}
-              </Picker>
-            </View>
-
-            <View style={styles.card}>
-              <Picker
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({categoryValue3: itemValue})
-                }
-                style={{color: 'white'}}>
-                <Picker.Item
-                  label="Choose Category"
-                  value=""
-                  style={{
-                    color: 'grey',
-                    fontSize: 14,
-                  }}
-                />
-                {this.state.dataSource.map((item, index) => {
-                  return (
-                    <Picker.Item
-                      label={item.categoryName}
-                      value={item.categoryName}
-                      key={index}
-                    />
-                  );
-                })}
-              </Picker>
-            </View>
-
-            <View style={styles.card}>
-              <Picker
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({categoryValue4: itemValue})
-                }
-                style={{color: 'white'}}>
-                <Picker.Item
-                  label="Choose Category"
-                  value=""
-                  style={{
-                    color: 'grey',
-                    fontSize: 14,
-                  }}
-                />
-                {this.state.dataSource.map((item, index) => {
-                  return (
-                    <Picker.Item
-                      label={item.categoryName}
-                      value={item.categoryName}
-                      key={index}
-                    />
-                  );
-                })}
-              </Picker>
-            </View>
-
-            <View style={styles.card}>
-              <Picker
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({categoryValue5: itemValue})
-                }
-                style={{color: 'white'}}>
-                <Picker.Item
-                  label="Choose Category"
-                  value=""
-                  style={{
-                    color: 'grey',
-                    fontSize: 14,
-                  }}
-                />
-                {this.state.dataSource.map((item, index) => {
-                  return (
-                    <Picker.Item
-                      label={item.categoryName}
-                      value={item.categoryName}
-                      key={index}
-                    />
-                  );
-                })}
-              </Picker>
-            </View>
             <TouchableOpacity
               style={styles.selectButton}
               onPress={this.selectImage}>

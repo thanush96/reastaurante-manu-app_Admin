@@ -20,6 +20,7 @@ import * as Progress from 'react-native-progress';
 import {Picker} from '@react-native-picker/picker';
 import COLORS from '../../components/colors/color';
 import WarningMessage from '../../components/Alert/warningMessage';
+import CheckBox from '@react-native-community/checkbox';
 
 export default class Edit extends Component {
   constructor(props) {
@@ -31,11 +32,6 @@ export default class Edit extends Component {
       description: '',
       image: '',
       imageurl: null,
-      categoryValue: '',
-      categoryValue2: '',
-      categoryValue3: '',
-      categoryValue4: '',
-      categoryValue5: '',
       uploading: false,
       imageChoosed: false,
       transferred: 0,
@@ -50,6 +46,8 @@ export default class Edit extends Component {
       dublicateAtert: false,
       itemNameInLastTime: '',
       ExistFood: [],
+      categoryArray: [],
+      categoryShow: false,
     };
   }
   async get_firebase_list() {
@@ -101,14 +99,43 @@ export default class Edit extends Component {
           unitPrice: contactItem.unitPrice,
           description: contactItem.description,
           imageurl: contactItem.imgUrl,
-          categoryValue: contactItem.category,
-          categoryValue2: contactItem.category2,
-          categoryValue3: contactItem.category3,
-          categoryValue4: contactItem.category4,
-          categoryValue5: contactItem.category5,
           itemNameInLastTime: contactItem.name,
+          categoryArray: contactItem.category,
         });
+
+        // console.log(this.state.categoryArray);
       });
+  }
+
+  onchecked(categoryName) {
+    // console.log(categoryName);
+    const data = this.state.dataSource;
+    const index = data.findIndex(x => x.categoryName === categoryName);
+    // console.log(index);
+    data[index].checked = !data[index].checked;
+    this.setState(data);
+    // console.log(this.state.dataSource);
+  }
+
+  renderItem() {
+    return this.state.dataSource.map((item, key) => {
+      return (
+        <TouchableOpacity
+          style={{flexDirection: 'row'}}
+          key={key}
+          onPress={() => {
+            this.onchecked(item.categoryName);
+          }}>
+          <CheckBox
+            value={item.checked}
+            onValueChange={() => {
+              this.onchecked(item.categoryName);
+            }}
+          />
+          <Text>{item.categoryName}</Text>
+        </TouchableOpacity>
+      );
+    });
   }
 
   onChangeText = (nameState, value) => {
@@ -117,25 +144,19 @@ export default class Edit extends Component {
     });
   };
 
-  onSubmit = imageUrl => {
+  onSubmit = (imageUrl, selectedArray) => {
     const AddContact = FIREBASE.database().ref(
       'contact/' + this.props.route.params.id,
     );
     const contact = {
       name: this.state.name,
-      category: this.state.categoryValue,
-      category2: this.state.categoryValue2,
-      category3: this.state.categoryValue3,
-      category4: this.state.categoryValue4,
-      category5: this.state.categoryValue5,
-      unitPrice: this.state.unitPrice,
+      category: selectedArray,
       description: this.state.description,
       imgUrl: imageUrl,
     };
 
     AddContact.update(contact)
       .then(data => {
-        // CUSTOM ALERT MESSAGE
         this.successShowAlert();
         console.log('updated');
       })
@@ -179,12 +200,28 @@ export default class Edit extends Component {
       });
     }
 
+    // CATEGORY VALIDATION
+    var key = this.state.dataSource.map(t => t.categoryName);
+    var checks = this.state.dataSource.map(t => t.checked);
+    let selectedArray = [];
+    if (this.state.categoryShow) {
+      for (let i = 0; i < checks.length; i++) {
+        if (checks[i] == true) {
+          selectedArray.push(key[i]);
+        }
+      }
+      console.log('True', selectedArray);
+    } else {
+      selectedArray = this.state.categoryArray;
+      console.log('False', selectedArray);
+    }
+
     if (this.state.imageChoosed) {
       if (this.state.name) {
         if (this.state.unitPrice) {
           if (this.state.description) {
-            if (this.state.categoryValue) {
-              if (!isNaN(this.state.unitPrice)) {
+            if (!isNaN(this.state.unitPrice)) {
+              if (selectedArray.length != 0) {
                 if (this.state.itemNameInLastTime == this.state.name) {
                   console.log('Same Food Name');
                   const filename = uri.substring(uri.lastIndexOf('/') + 1);
@@ -207,7 +244,7 @@ export default class Edit extends Component {
                     const imageRef = storage().ref(filename);
                     const url = await imageRef.getDownloadURL();
                     console.log(url);
-                    this.onSubmit(url);
+                    this.onSubmit(url, selectedArray);
                   } catch (e) {
                     console.error(('error', e));
                   }
@@ -235,7 +272,7 @@ export default class Edit extends Component {
                       const imageRef = storage().ref(filename);
                       const url = await imageRef.getDownloadURL();
                       console.log(url);
-                      this.onSubmit(url);
+                      this.onSubmit(url, selectedArray);
                     } catch (e) {
                       console.error(('error', e));
                     }
@@ -245,10 +282,11 @@ export default class Edit extends Component {
                   }
                 }
               } else {
-                this.showPriceNumValAlert();
+                this.showCategoryValAlert();
+                console.log(selectedArray);
               }
             } else {
-              this.showCategoryValAlert();
+              this.showPriceNumValAlert();
             }
           } else {
             this.showDescriptionValAlert();
@@ -260,25 +298,27 @@ export default class Edit extends Component {
         this.showNameValAlert();
       }
     } else {
+      console.log('Not image');
       if (this.state.name) {
         if (this.state.unitPrice) {
           if (this.state.description) {
-            if (this.state.categoryValue) {
-              if (!isNaN(this.state.unitPrice)) {
+            if (!isNaN(this.state.unitPrice)) {
+              if (selectedArray.length != 0) {
                 if (this.state.itemNameInLastTime == this.state.name) {
-                  this.onSubmit(this.state.imageurl);
+                  this.onSubmit(this.state.imageurl, selectedArray);
                 } else {
                   if (!duplicate) {
-                    this.onSubmit(this.state.imageurl);
+                    this.onSubmit(this.state.imageurl, selectedArray);
                   } else {
                     this.showDublicateAlert();
                   }
                 }
               } else {
-                this.showPriceNumValAlert();
+                this.showCategoryValAlert();
+                console.log(selectedArray);
               }
             } else {
-              this.showCategoryValAlert();
+              this.showPriceNumValAlert();
             }
           } else {
             this.showDescriptionValAlert();
@@ -289,20 +329,13 @@ export default class Edit extends Component {
       } else {
         this.showNameValAlert();
       }
-
-      // if (
-      //   this.state.name &&
-      //   this.state.unitPrice &&
-      //   this.state.description &&
-      //   this.state.categoryValue &&
-      //   !isNaN(this.state.unitPrice)
-      // ) {
-      //   this.onSubmit(this.state.imageurl);
-      // } else {
-      //   this.showAlert();
-      //   console.log('Please input feild');
-      // }
     }
+  };
+
+  categoryChange = () => {
+    this.setState({
+      categoryShow: true,
+    });
   };
 
   // SUCCESSFULL ALERT FUNCTIONS
@@ -453,136 +486,26 @@ export default class Edit extends Component {
               placeholderTextColor="grey"
               maxLength={40}
             />
-            <Text style={{color: 'white', marginBottom: 5}}>Category</Text>
-            <View style={styles.card}>
-              <Picker
-                style={{color: 'white'}}
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({categoryValue: itemValue})
-                }>
-                <Picker.Item
-                  label={this.state.categoryValue}
-                  value={this.state.categoryValue}
-                  style={{
-                    color: 'grey',
-                    fontSize: 14,
-                  }}
-                />
-                {this.state.dataSource.map((item, index) => {
-                  return (
-                    <Picker.Item
-                      label={item.categoryName}
-                      value={item.categoryName}
-                      key={index}
-                    />
-                  );
-                })}
-              </Picker>
-            </View>
 
-            <View style={styles.card}>
-              <Picker
-                style={{color: 'white'}}
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({categoryValue2: itemValue})
-                }>
-                <Picker.Item
-                  label={this.state.categoryValue2}
-                  value={this.state.categoryValue2}
-                  style={{
-                    color: 'grey',
-                    fontSize: 14,
-                  }}
-                />
-                {this.state.dataSource.map((item, index) => {
-                  return (
-                    <Picker.Item
-                      label={item.categoryName}
-                      value={item.categoryName}
-                      key={index}
-                    />
-                  );
-                })}
-              </Picker>
-            </View>
+            {this.state.categoryArray.map((item, key) => {
+              return (
+                <Text key={key} style={{color: 'white'}}>
+                  {item}
+                </Text>
+              );
+            })}
 
-            <View style={styles.card}>
-              <Picker
-                style={{color: 'white'}}
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({categoryValue3: itemValue})
-                }>
-                <Picker.Item
-                  label={this.state.categoryValue3}
-                  value={this.state.categoryValue3}
-                  style={{
-                    color: 'grey',
-                    fontSize: 14,
-                  }}
-                />
-                {this.state.dataSource.map((item, index) => {
-                  return (
-                    <Picker.Item
-                      label={item.categoryName}
-                      value={item.categoryName}
-                      key={index}
-                    />
-                  );
-                })}
-              </Picker>
-            </View>
+            <TouchableOpacity
+              style={styles.selectButton}
+              onPress={this.categoryChange}>
+              <Text style={styles.buttonText}>Change Category</Text>
+            </TouchableOpacity>
 
-            <View style={styles.card}>
-              <Picker
-                style={{color: 'white'}}
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({categoryValue4: itemValue})
-                }>
-                <Picker.Item
-                  label={this.state.categoryValue4}
-                  value={this.state.categoryValue4}
-                  style={{
-                    color: 'grey',
-                    fontSize: 14,
-                  }}
-                />
-                {this.state.dataSource.map((item, index) => {
-                  return (
-                    <Picker.Item
-                      label={item.categoryName}
-                      value={item.categoryName}
-                      key={index}
-                    />
-                  );
-                })}
-              </Picker>
-            </View>
-
-            <View style={styles.card}>
-              <Picker
-                style={{color: 'white'}}
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({categoryValue5: itemValue})
-                }>
-                <Picker.Item
-                  label={this.state.categoryValue5}
-                  value={this.state.categoryValue5}
-                  style={{
-                    color: 'grey',
-                    fontSize: 14,
-                  }}
-                />
-                {this.state.dataSource.map((item, index) => {
-                  return (
-                    <Picker.Item
-                      label={item.categoryName}
-                      value={item.categoryName}
-                      key={index}
-                    />
-                  );
-                })}
-              </Picker>
-            </View>
+            {this.state.categoryShow ? (
+              <View>
+                <View>{this.renderItem()}</View>
+              </View>
+            ) : null}
 
             <TouchableOpacity
               style={styles.selectButton}
