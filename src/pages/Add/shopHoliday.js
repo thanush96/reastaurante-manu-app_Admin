@@ -15,6 +15,8 @@ import {InputData} from '../../components';
 import WarningMessage from '../../components/Alert/warningMessage';
 import COLORS from '../../components/colors/color';
 import FIREBASE from '../../config/FIREBASE';
+import {Calendar} from 'react-native-calendars';
+import DateFormat from 'react-native-date-format';
 
 export default class holiday extends Component {
   constructor(props) {
@@ -24,8 +26,11 @@ export default class holiday extends Component {
       showAlert: false,
       successAlertMsg: false,
       DupAlerMsg: false,
-      oldDates: [],
+      days: [],
+      day: [],
+      marked: null,
       date: '',
+      calendarShow: false,
     };
   }
 
@@ -45,9 +50,32 @@ export default class holiday extends Component {
   }
   async componentWillMount() {
     this.setState({
-      oldDates: await this.get_firebase_list(),
+      days: await this.get_firebase_list(),
+    });
+
+    const dayy = [];
+    this.state.days.map((item, index) => {
+      dayy.push(item.holidayDate);
+      this.setState({
+        day: dayy,
+      });
     });
   }
+
+  anotherFunc = () => {
+    console.log('anotherFunc');
+    var obj = this.state.day.reduce(
+      (c, v) =>
+        Object.assign(c, {
+          [v]: {
+            disabled: true,
+            disableTouchEvent: true,
+          },
+        }),
+      {},
+    );
+    this.setState({marked: obj, calendarShow: true});
+  };
 
   onChangeText = (nameState, value) => {
     this.setState({
@@ -56,38 +84,23 @@ export default class holiday extends Component {
   };
 
   onSubmit = () => {
-    let duplicate = false;
     if (this.state.date) {
-      this.state.oldDates.map((item, index) => {
-        if (item.holidayDate === this.state.date) {
-          duplicate = true;
-        }
-      });
-    } else {
-      this.showAlert();
-    }
-
-    if (this.state.date) {
-      if (!duplicate) {
-        const addHolidays = FIREBASE.database().ref('holidays');
-        const holidays = {
-          holidayDate: this.state.date,
-        };
-        addHolidays
-          .push(holidays)
-          .then(data => {
-            this.successShowAlert();
-            this.setState({
-              date: '',
-            });
-          })
-
-          .catch(error => {
-            console.log('Error :', error);
+      const addHolidays = FIREBASE.database().ref('holidays');
+      const holidays = {
+        holidayDate: this.state.date,
+      };
+      addHolidays
+        .push(holidays)
+        .then(data => {
+          this.successShowAlert();
+          this.setState({
+            date: '',
           });
-      } else {
-        this.showDupAlerMsg();
-      }
+        })
+
+        .catch(error => {
+          console.log('Error :', error);
+        });
     } else {
       this.showAlert();
     }
@@ -138,76 +151,94 @@ export default class holiday extends Component {
     var today = new Date();
     return (
       <SafeAreaView style={styles.conatiner}>
-        <View style={styles.header}>
-          <View style={styles.title}>
-            <Text style={styles.headerText}>Add Holiday</Text>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled">
+          <View style={styles.header}>
+            <View style={styles.title}>
+              <Text style={styles.headerText}>Add Holiday</Text>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.pages}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled">
-            <DatePicker
-              style={styles.datePickerStyle}
-              date={this.state.date}
-              mode="date"
-              placeholder="Select Your Order date"
-              format="DD-MM-YYYY"
-              minDate={today}
-              maxDate="01-01-2051"
-              confirmBtnText="Confirm"
-              cancelBtnText="Cancel"
-              customStyles={{
-                dateIcon: {
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  marginLeft: 10,
-                },
-                dateInput: {
-                  marginLeft: 0,
-                  backgroundColor: 'grey',
-                  borderColor: 'red',
-                  borderWidth: 10,
-                  height: 45,
-                  marginBottom: 10,
-                  borderWidth: 0,
-                },
-              }}
-              onDateChange={date => {
-                this.setState({
-                  date: date,
-                });
-              }}
+          <View style={styles.pages}>
+            <TextInput
+              placeholderTextColor="grey"
+              onFocus={this.anotherFunc}
+              placeholder="Holiday Date"
+              style={styles.textInput}
+              onChangeText={text => onChangeText(date, text)}
+              value={this.state.date}
             />
+            {this.state.calendarShow ? (
+              <Calendar
+                style={{
+                  borderRadius: 8,
+                }}
+                markedDates={this.state.marked}
+                minDate={today}
+                onDayPress={day => {
+                  this.setState({
+                    date: day.dateString,
+                  });
+                  console.log('selected day', this.state.date);
+                }}
+                theme={{
+                  calendarBackground: '#ffffff',
+                  textSectionTitleColor: '#b6c1cd',
+                  textSectionTitleDisabledColor: '#d9e1e8',
+                  selectedDayBackgroundColor: '#00adf5',
+                  selectedDayTextColor: '#ffffff',
+                  dayTextColor: COLORS.secondary,
+                  dotColor: '#00adf5',
+                  selectedDotColor: '#ffffff',
+                  arrowColor: COLORS.secondary,
+                  monthTextColor: COLORS.secondary,
+                  textDayFontFamily: 'monospace',
+                  textMonthFontFamily: 'monospace',
+                  textDayHeaderFontFamily: 'monospace',
+                  textDayFontWeight: '300',
+                  textMonthFontWeight: 'bold',
+                  textDayHeaderFontWeight: '300',
+                  textDayFontSize: 16,
+                  textMonthFontSize: 16,
+                  textDayHeaderFontSize: 16,
+                }}
+              />
+            ) : null}
+
             <TouchableOpacity
               style={styles.touch}
               onPress={() => this.onSubmit()}>
               <Text style={styles.submit}>Add</Text>
             </TouchableOpacity>
-          </ScrollView>
-        </View>
-        <WarningMessage
-          title="Sorry!"
-          message="Please Select Holiday Date"
-          hideAlert={this.hideAlert}
-          showAlert={showAlert}
-        />
 
-        <WarningMessage
-          title="Successfull!"
-          message="Your New Holiday Assigned"
-          hideAlert={this.hideAlertSuccessMsg}
-          showAlert={successAlertMsg}
-        />
+            <TouchableOpacity
+              style={styles.touch}
+              onPress={() => this.props.navigation.navigate('holidayCalendar')}>
+              <Text style={styles.submit}>Show Holiday Calendar</Text>
+            </TouchableOpacity>
+          </View>
+          <WarningMessage
+            title="Sorry!"
+            message="Please Select Holiday Date"
+            hideAlert={this.hideAlert}
+            showAlert={showAlert}
+          />
 
-        <WarningMessage
-          title="Sorry!"
-          message="This Holiday Already Assigned"
-          hideAlert={this.hideDupAlerMsg}
-          showAlert={DupAlerMsg}
-        />
+          <WarningMessage
+            title="Successfull!"
+            message="Your New Holiday Assigned"
+            hideAlert={this.hideAlertSuccessMsg}
+            showAlert={successAlertMsg}
+          />
+
+          <WarningMessage
+            title="Sorry!"
+            message="This Holiday Already Assigned"
+            hideAlert={this.hideDupAlerMsg}
+            showAlert={DupAlerMsg}
+          />
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -222,8 +253,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 30,
     backgroundColor: 'rgba(4, 6, 31, 0.75)',
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    borderRadius: 15,
+
     marginHorizontal: 15,
   },
   title: {
@@ -254,5 +285,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 16,
+  },
+
+  textInput: {
+    borderWidth: 1,
+    borderColor: 'white',
+    color: 'white',
+    borderRadius: 5,
+    marginBottom: 10,
   },
 });

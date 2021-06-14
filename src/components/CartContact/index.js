@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 100,
     borderColor: 'white',
-    borderWidth: 2,
+    borderWidth: 1,
   },
 
   icon: {

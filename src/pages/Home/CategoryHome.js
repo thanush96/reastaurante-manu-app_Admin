@@ -7,7 +7,7 @@ import {
   Alert,
   ScrollView,
   RefreshControl,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faPlus} from '@fortawesome/free-solid-svg-icons';
@@ -23,8 +23,11 @@ export default class CategoryHome extends Component {
     this.state = {
       category: {},
       categoryKey: [],
+      contact: {},
+      contactKey: [],
       showAlert: false,
       getId: '',
+      getName: '',
       refreshing: false,
     };
   }
@@ -40,6 +43,7 @@ export default class CategoryHome extends Component {
   }
 
   MountData() {
+    this.MountFoods();
     console.log('refreshing');
     FIREBASE.database()
       .ref('categories')
@@ -55,24 +59,77 @@ export default class CategoryHome extends Component {
       });
   }
 
+  MountFoods() {
+    // console.log('MountFoods');
+    FIREBASE.database()
+      .ref('contact')
+      .once('value', querySnapShot => {
+        let data = querySnapShot.val() ? querySnapShot.val() : {};
+        let contactItem = {...data};
+
+        this.setState({
+          contact: contactItem,
+          contactKey: Object.keys(contactItem),
+        });
+      });
+  }
+
   // ALERT FUNCTIONS
-  showAlert = id => {
+  showAlert = (id, name) => {
     this.setState({
       showAlert: true,
       getId: id,
+      getName: name,
     });
   };
 
   confirmAlert = () => {
     console.log('confirmAlert');
+    console.log(this.state.getName);
     FIREBASE.database()
       .ref('categories/' + this.state.getId)
       .remove();
+    this.componentUpdateFoodCategory();
     this.MountData();
     this.setState({
       showAlert: false,
     });
   };
+
+  componentUpdateFoodCategory() {
+    // console.log('this.componentUpdateFoodCategory()');
+    let source = [];
+    let keys = [];
+    this.state.contactKey.map(key => {
+      keys.push(key);
+      let arr = [];
+      for (let i = 0; i < this.state.contact[key].category.length; i++) {
+        if (this.state.contact[key].category[i] == this.state.getName) {
+        } else {
+          arr.push(this.state.contact[key].category[i]);
+        }
+      }
+      source.push(arr);
+    });
+
+    console.log(source);
+
+    for (let i = 0; i < keys.length; i++) {
+      const AddCategory = FIREBASE.database().ref('contact/' + keys[i]);
+
+      const category = {
+        category: source[i],
+      };
+      console.log(AddCategory, category);
+      AddCategory.update(category)
+        .then(data => {
+          // console.log('Update All Food Category');
+        })
+        .catch(error => {
+          console.log('Error :', error);
+        });
+    }
+  }
 
   hideAlert = () => {
     console.log('hide');

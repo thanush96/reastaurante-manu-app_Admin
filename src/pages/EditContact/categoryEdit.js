@@ -19,12 +19,15 @@ export default class categoryEdit extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      contact: {},
+      contactKey: [],
       Name: '',
       showAlert: false,
       successAlertMsg: false,
       dublicateAtert: false,
       categoryNameInLastTime: '',
       existCategories: [],
+      dataSource: [],
     };
   }
 
@@ -42,13 +45,31 @@ export default class categoryEdit extends Component {
         return items;
       });
   }
+
+  MountFoods() {
+    // console.log('MountFoods');
+    FIREBASE.database()
+      .ref('contact')
+      .once('value', querySnapShot => {
+        let data = querySnapShot.val() ? querySnapShot.val() : {};
+        let contactItem = {...data};
+
+        this.setState({
+          contact: contactItem,
+          contactKey: Object.keys(contactItem),
+        });
+      });
+  }
+
   async componentWillMount() {
     this.setState({
       existCategories: await this.get_Exist_Category_Name(),
+      // dataSource: await this.get_firebase_list(),
     });
   }
 
   componentDidMount() {
+    this.MountFoods();
     FIREBASE.database()
       .ref('categories/' + this.props.route.params.id)
       .once('value', querySnapShot => {
@@ -62,9 +83,57 @@ export default class categoryEdit extends Component {
       });
   }
 
+  componentUpdateFoodCategory() {
+    // console.log('this.componentUpdateFoodCategory()');
+    let source = [];
+    let keys = [];
+    this.state.contactKey.map(key => {
+      keys.push(key);
+      let arr = [];
+      for (let i = 0; i < this.state.contact[key].category.length; i++) {
+        if (
+          this.state.contact[key].category[i] ==
+          this.state.categoryNameInLastTime
+        ) {
+          arr.push(this.state.Name);
+        } else {
+          arr.push(this.state.contact[key].category[i]);
+        }
+      }
+      source.push(arr);
+    });
+
+    for (let i = 0; i < keys.length; i++) {
+      const AddCategory = FIREBASE.database().ref('contact/' + keys[i]);
+
+      const category = {
+        category: source[i],
+      };
+      console.log(AddCategory, category);
+      AddCategory.update(category)
+        .then(data => {
+          // console.log('Update All Food Category');
+        })
+        .catch(error => {
+          console.log('Error :', error);
+        });
+    }
+  }
+
   onChangeText = (nameState, value) => {
     this.setState({
       [nameState]: value,
+    });
+  };
+
+  category = () => {
+    console.log(this.state.dataSource);
+    this.state.dataSource.map((item, key) => {
+      for (let i = 0; i < item.category.length; i++) {
+        if (item.category[i] == this.state.Name) {
+          console.log(item.category[i]);
+        }
+      }
     });
   };
 
@@ -89,6 +158,7 @@ export default class categoryEdit extends Component {
 
         AddCategory.update(category)
           .then(data => {
+            this.componentUpdateFoodCategory();
             this.successShowAlert();
           })
 
@@ -106,6 +176,7 @@ export default class categoryEdit extends Component {
 
           AddCategory.update(category)
             .then(data => {
+              this.componentUpdateFoodCategory();
               this.successShowAlert();
             })
 
@@ -185,6 +256,7 @@ export default class categoryEdit extends Component {
 
             <TouchableOpacity
               style={styles.touch}
+              // onPress={() => this.componentUpdateFoodCategory()}>
               onPress={() => this.onSubmit()}>
               <Text style={styles.submit}>Submit</Text>
             </TouchableOpacity>

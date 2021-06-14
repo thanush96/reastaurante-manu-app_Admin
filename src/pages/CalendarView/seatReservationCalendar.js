@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import {View, TouchableOpacity, Text} from 'react-native';
+import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
 import {Calendar} from 'react-native-calendars';
 import FIREBASE from '../../config/FIREBASE/index';
 import DateFormat from 'react-native-date-format';
+import COLORS from '../../components/colors/color';
 
-export default class tag extends Component {
+export default class SeatReservationCalendarView extends Component {
   constructor(props) {
     super(props);
 
@@ -17,7 +18,7 @@ export default class tag extends Component {
 
   async get_firebase_Dates() {
     return FIREBASE.database()
-      .ref('BulkOrders')
+      .ref('Seat_Reservation')
       .once('value')
       .then(function (snapshot) {
         var BulkOrderDates = [];
@@ -37,17 +38,24 @@ export default class tag extends Component {
 
     const dayy = [];
     this.state.days.map((item, index) => {
-      DateFormat.formatDate(
-        item.GiveDate,
-        'dd-MM-yyyy',
-        'yyyy-MM-dd',
-        formatedDate => {
-          dayy.push(formatedDate);
-          this.setState({
-            day: dayy,
-          });
-        },
-      );
+      dayy.push(item.GiveDate);
+      this.setState({
+        day: dayy,
+      });
+
+      // const dayy = [];
+      // this.state.days.map((item, index) => {
+      //   DateFormat.formatDate(
+      //     item.GiveDate,
+      //     'dd-MM-yyyy',
+      //     'yyyy-MM-dd',
+      //     formatedDate => {
+      //       dayy.push(formatedDate);
+      //       this.setState({
+      //         day: dayy,
+      //       });
+      //     },
+      //   );
     });
   }
 
@@ -70,10 +78,26 @@ export default class tag extends Component {
       <View style={{flex: 1}}>
         <Calendar markedDates={this.state.marked} />
 
-        <TouchableOpacity onPress={this.anotherFunc}>
-          <Text>Show</Text>
+        <TouchableOpacity style={styles.touch} onPress={this.anotherFunc}>
+          <Text style={styles.submit}>Seat Reservation Dates</Text>
         </TouchableOpacity>
       </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  touch: {
+    backgroundColor: COLORS.primary,
+    marginHorizontal: 50,
+    padding: 10,
+    // borderRadius: 5,
+    marginTop: 10,
+  },
+  submit: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 16,
+  },
+});

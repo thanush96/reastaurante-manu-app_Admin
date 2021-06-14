@@ -12,7 +12,6 @@ import OtpInputData from '../../components/InputData/otpInputBox';
 import CustomAlert from '../../components/Alert/deleteAlert';
 import COLORS from '../../components/colors/color';
 
-
 export default class BulkOrderHome extends Component {
   constructor(props) {
     super(props);
@@ -25,7 +24,6 @@ export default class BulkOrderHome extends Component {
       getId: '',
     };
   }
-
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
@@ -144,7 +142,17 @@ export default class BulkOrderHome extends Component {
             style={styles.touch}
             onPress={() => this.reset()}
             keyboardShouldPersistTaps={'always'}>
-          <Text style={styles.submit}>RESET OTP</Text>
+            <Text style={styles.submit}>RESET OTP</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.touchCalendarView}
+            onPress={() => this.reset()}
+            keyboardShouldPersistTaps={'always'}
+            onPress={() =>
+              this.props.navigation.navigate('SeatReservationsCalendar')
+            }>
+            <Text style={styles.textCalendarView}>Calendar View</Text>
           </TouchableOpacity>
         </View>
 
@@ -221,6 +229,22 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 50,
   },
+
+  touchCalendarView: {
+    borderWidth: 1,
+    borderColor: 'red',
+    padding: 10,
+    marginTop: 20,
+    borderRadius: 50,
+  },
+
+  textCalendarView: {
+    color: 'red',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 14,
+  },
+
   submit: {
     color: 'white',
     fontWeight: 'bold',

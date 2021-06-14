@@ -29,7 +29,7 @@ const CategoryCard = ({id, categoryItem, navigation, removeData}) => {
             color={'white'}
             size={25}
             onPress={() => {
-              removeData(id);
+              removeData(id, categoryItem.categoryName);
             }}
           />
         </View>
