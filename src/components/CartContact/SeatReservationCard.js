@@ -18,6 +18,7 @@ const SeatReservationCard = ({id, seatReservation, reserved}) => {
         <View>
           <Text style={styles.CardTitleText}>OTP - {seatReservation.otp}</Text>
 
+          <Text style={styles.CardText}>Table : {seatReservation.table}</Text>
           <Text style={styles.CardText}>Seat : {seatReservation.Seat}</Text>
 
           <Text style={styles.CardText}>
@@ -30,7 +31,7 @@ const SeatReservationCard = ({id, seatReservation, reserved}) => {
             Mobile : {seatReservation.CustomerContactNo}
           </Text>
           <Text style={styles.CardText}>
-            Ordered date : {seatReservation.OrderderedDate}
+            Reservation on : {seatReservation.OrderderedDate}
           </Text>
         </View>
 

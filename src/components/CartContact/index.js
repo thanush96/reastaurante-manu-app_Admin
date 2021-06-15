@@ -23,7 +23,7 @@ const CardContact = ({id, contactItem, navigation, removeData}) => {
           <Text style={styles.name}>{contactItem.name}</Text>
           <View
             style={{
-              backgroundColor: 'red',
+              backgroundColor: COLORS.primary,
               width: Dimensions.get('window').width / 5,
               color: 'white',
               borderBottomRightRadius: 10,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
 
   deleteAction: {
-    backgroundColor: 'red',
+    backgroundColor: COLORS.dark,
     fontSize: 18,
     width: 120,
     textAlign: 'center',

@@ -50,6 +50,24 @@ export default class Edit extends Component {
       categoryShow: false,
     };
   }
+
+  componentDidMount() {
+    FIREBASE.database()
+      .ref('contact/' + this.props.route.params.id)
+      .once('value', querySnapShot => {
+        let data = querySnapShot.val() ? querySnapShot.val() : {};
+        let contactItem = {...data};
+        this.setState({
+          name: contactItem.name,
+          unitPrice: contactItem.unitPrice,
+          description: contactItem.description,
+          imageurl: contactItem.imgUrl,
+          itemNameInLastTime: contactItem.name,
+          categoryArray: contactItem.category,
+        });
+      });
+  }
+
   async get_firebase_list() {
     return FIREBASE.database()
       .ref('categories')
@@ -85,40 +103,47 @@ export default class Edit extends Component {
       dataSource: await this.get_firebase_list(),
       ExistFood: await this.get_Exist_Food_Name(),
     });
-  }
 
-  componentDidMount() {
-    FIREBASE.database()
-      .ref('contact/' + this.props.route.params.id)
-      .once('value', querySnapShot => {
-        let data = querySnapShot.val() ? querySnapShot.val() : {};
-        let contactItem = {...data};
-
-        this.setState({
-          name: contactItem.name,
-          unitPrice: contactItem.unitPrice,
-          description: contactItem.description,
-          imageurl: contactItem.imgUrl,
-          itemNameInLastTime: contactItem.name,
-          categoryArray: contactItem.category,
+    let temp = this.state.categoryArray;
+    let fullData = this.state.dataSource;
+    let formatData = [];
+    for (let i = 0; i < fullData.length; i++) {
+      // for (let j = 0; j < temp.length; j++) {
+      if (
+        fullData[i].categoryName == temp[0] ||
+        fullData[i].categoryName == temp[1] ||
+        fullData[i].categoryName == temp[2] ||
+        fullData[i].categoryName == temp[4] ||
+        fullData[i].categoryName == temp[5] ||
+        fullData[i].categoryName == temp[6] ||
+        fullData[i].categoryName == temp[7]
+      ) {
+        formatData.push({
+          categoryName: fullData[i].categoryName,
+          checked: true,
         });
-
-        // console.log(this.state.categoryArray);
-      });
+      } else {
+        formatData.push({
+          categoryName: fullData[i].categoryName,
+          checked: false,
+        });
+      }
+      // }
+    }
+    this.setState({data: formatData});
+    console.log(formatData);
   }
 
   onchecked(categoryName) {
-    // console.log(categoryName);
-    const data = this.state.dataSource;
+    const data = this.state.data;
     const index = data.findIndex(x => x.categoryName === categoryName);
-    // console.log(index);
     data[index].checked = !data[index].checked;
     this.setState(data);
-    // console.log(this.state.dataSource);
+    console.log(data);
   }
 
   renderItem() {
-    return this.state.dataSource.map((item, key) => {
+    return this.state.data.map((item, key) => {
       return (
         <TouchableOpacity
           style={{flexDirection: 'row'}}
@@ -150,6 +175,7 @@ export default class Edit extends Component {
     );
     const contact = {
       name: this.state.name,
+      unitPrice: this.state.unitPrice,
       category: selectedArray,
       description: this.state.description,
       imgUrl: imageUrl,
@@ -201,8 +227,8 @@ export default class Edit extends Component {
     }
 
     // CATEGORY VALIDATION
-    var key = this.state.dataSource.map(t => t.categoryName);
-    var checks = this.state.dataSource.map(t => t.checked);
+    var key = this.state.data.map(t => t.categoryName);
+    var checks = this.state.data.map(t => t.checked);
     let selectedArray = [];
     if (this.state.categoryShow) {
       for (let i = 0; i < checks.length; i++) {
@@ -211,9 +237,6 @@ export default class Edit extends Component {
         }
       }
       console.log('True', selectedArray);
-    } else {
-      selectedArray = this.state.categoryArray;
-      console.log('False', selectedArray);
     }
 
     if (this.state.imageChoosed) {
@@ -487,13 +510,13 @@ export default class Edit extends Component {
               maxLength={40}
             />
 
-            {this.state.categoryArray.map((item, key) => {
+            {/* {this.state.categoryArray.map((item, key) => {
               return (
                 <Text key={key} style={{color: 'white'}}>
                   {item}
                 </Text>
               );
-            })}
+            })} */}
 
             <TouchableOpacity
               style={styles.selectButton}
@@ -510,7 +533,7 @@ export default class Edit extends Component {
             <TouchableOpacity
               style={styles.selectButton}
               onPress={this.selectImage}>
-              <Text style={styles.buttonText}>Pick an image</Text>
+              <Text style={styles.buttonText}>Change an image</Text>
             </TouchableOpacity>
 
             {this.state.imageChoosed ? (
@@ -522,7 +545,14 @@ export default class Edit extends Component {
                   />
                 ) : null}
               </View>
-            ) : null}
+            ) : (
+              <View style={styles.imgcontainer}>
+                <Image
+                  source={{uri: this.state.imageurl}}
+                  style={styles.imageBox}
+                />
+              </View>
+            )}
 
             {this.state.uploading ? (
               <View style={styles.progressBarContainer}>
